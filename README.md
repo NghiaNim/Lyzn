@@ -231,9 +231,9 @@ This isn't just a product. It's **financial inclusion for the 33 million SMEs th
 
 ## Team & Contact
 
-**Built at:** HackPrinceton
-**Team:** Crystal (L)ow, Angelina (Y)eh, Anna (Z)hang, (N)ghia Nim
-**Contact:** nghia.nim@columbia.edu
+1. **Built at:** HackPrinceton
+2. **Team:** Crystal (L)ow, Angelina (Y)eh, Anna (Z)hang, (N)ghia Nim
+3. **Contact:** nghia.nim@columbia.edu
 
 ---
 
