@@ -19,7 +19,7 @@ Or visit `/demo` directly to see the entire platform in action.
 
 ## The Problem
 
-Small businesses get crushed by price volatility they can't control. When a bakery's sugar costs spike 40%, their margins evaporate. When a restaurant's currency costs swing, they can't forecast expenses. Unlike Fortune 500 companies, SMEs have **no way to protect themselves**:
+Small businesses get crushed by price volatility they can't control. When a bakery's sugar costs spike 40%, their margins evaporate. When a restaurant's currency costs swing, they can't forecast expenses. Unlike Fortune 500 companies, SMEs have **no way to protect themselves**, which is why every year around 10% of businesses in the U.S. file for bankruptcy:
 
 - Derivatives markets require $100K+ minimums
 - Too complex—requires financial expertise they don't have
