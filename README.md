@@ -19,9 +19,9 @@ Small businesses get crushed by price volatility they can't control. When a bake
 
 ---
 
-## The Solution: Lyzn
+## The Solution: LYZN
 
-Lyzn matches businesses whose risks naturally offset each other—then automates everything with AI and smart contracts.
+LYZN matches businesses whose risks naturally offset each other—then automates everything with AI and smart contracts.
 
 ### How It Works
 
@@ -47,21 +47,25 @@ Lyzn matches businesses whose risks naturally offset each other—then automates
 
 ### What Are Event Contracts?
 
-Event contracts are derivative instruments whose payout depends on a specific outcome—like a commodity reaching a certain price. They're legally classified as **swaps** under the Commodity Exchange Act, [but without the price and complexity of other institutional swaps](https://www.youtube.com/watch?v=UqYGWXMJ78I).
+Event contracts are classified as **swaps** under the Commodity Exchange Act (CEA):
 
-**Swaps** are bilateral agreements between two parties that exchange payments based on an underlying reference (prices, rates, etc.). They're customizable, over-the-counter contracts regulated by the CFTC.
+> "A swap is an agreement, contract, or transaction that provides for payment dependent on the occurrence, nonoccurrence, or the extent of the occurrence of an event or contingency associated with a potential financial, economic, or commercial consequence."
+> 
+> — Commodity Exchange Act, 7 U.S.C. § 1a(47)
+
+The CFTC views event contracts as **binary options**—contracts where the payout depends entirely on a yes/no proposition. Since binary options fit the legal definition of swaps, they fall under CFTC jurisdiction, [though without the price and complexity of certain famous swaps](https://www.youtube.com/watch?v=UqYGWXMJ78I)
 
 ### Why This Is Legal (Not Gambling)
 
-Under the Commodity Exchange Act, derivatives exist outside gambling law because they serve an **economic purpose**: helping businesses manage legitimate risks. Airlines hedge jet fuel, coffee shops hedge coffee prices—Lyzn brings this same risk management to all SMEs.
+Under the Commodity Exchange Act, derivatives exist outside gambling law because they serve an **economic purpose**: helping businesses manage legitimate risks. Airlines hedge jet fuel, coffee shops hedge coffee prices—LYZN brings this same risk management to all SMEs.
 
 ### Regulatory Path
 
 - **Now (Hackathon):** Demo with no real money
-- **Phase 2:** Partner with CFTC-licensed exchange (like Kalshi)
-- **Phase 3:** Apply for Designated Contract Market (DCM) registration
+- **Phase 2:** Apply for Designated Contract Market (DCM) registration
+- **Phase 3:** Full compliance infrastructure: AML/KYC, market surveillance, customer fund segregation
 
-The 2024 Kalshi court victory established favorable precedent for event contracts as legitimate financial instruments.
+The 2024 Kalshi v. CFTC court victory established that event contracts are permissible financial instruments. The court ruled that the CFTC overstepped its authority in blocking event contracts, creating momentum for innovation in this space.
 
 ---
 
@@ -71,10 +75,26 @@ Our hackathon demo shows the complete flow:
 
 **1. Chat with AI:** 
 ```
-User: "I run a bakery. Sugar prices are killing my margins."
+User: "I run a bakery in Brooklyn."
 
-AI: "I understand. Let me identify your key risks and show you 
-available hedges from other businesses."
+AI: "Great! I'd love to understand your business better. 
+What are your main ingredients and supplies?"
+
+User: "We use a lot of sugar, wheat flour, and butter. 
+Also diesel for our delivery trucks."
+
+AI: "Got it. How much do you typically spend on these each month?"
+
+User: "Sugar is about $2,000/month, flour $1,500, butter $800."
+
+AI: "And how do price changes affect you? For example, 
+what happens if sugar prices spike?"
+
+User: "Last year sugar went up 40% and we almost went under. 
+We couldn't raise prices fast enough."
+
+AI: "I understand—that's a real risk. Let me show you 
+some ways to protect against these price swings."
 ```
 
 **2. AI Suggests Risks with Available Contracts:**
@@ -203,7 +223,7 @@ Three technologies converged to make this possible:
 
 The derivatives market is $600 trillion, but 99% of businesses are excluded.
 
-**Lyzn brings institutional hedging to Main Street.** A bakery in Brooklyn, a coffee shop in Seattle, a food truck in Austin—all can protect themselves like Fortune 500 companies do.
+**LYZN brings institutional hedging to Main Street.** A bakery in Brooklyn, a coffee shop in Seattle, a food truck in Austin—all can protect themselves like Fortune 500 companies do.
 
 This isn't just a product. It's **financial inclusion for the 33 million SMEs that need it most**.
 
@@ -212,6 +232,7 @@ This isn't just a product. It's **financial inclusion for the 33 million SMEs th
 ## Team & Contact
 
 **Built at:** HackPrinceton
+**Team:** Crystal (L)ow, Angelina (Y)eh, Anna (Z)hang, (N)ghia Nim
 **Contact:** nghia.nim@columbia.edu
 
 ---
