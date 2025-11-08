@@ -19,12 +19,13 @@ Or visit `/demo` directly to see the entire platform in action.
 
 ## The Problem
 
-Small businesses get crushed by price volatility they can't control. When a bakery's sugar costs spike 40%, their margins evaporate. When a restaurant's currency costs swing, they can't forecast expenses. Unlike Fortune 500 companies, SMEs have **no way to protect themselves**, which is why every year around 10% of businesses in the U.S. file for bankruptcy:
+Small businesses get crushed by price volatility they can't control. When a bakery's sugar costs spike 40%, their margins evaporate. When a restaurant's currency costs swing, they can't forecast expenses. Unlike Fortune 500 companies, SMEs have **no way to protect themselves**:
 
 - Derivatives markets require $100K+ minimums
 - Too complex—requires financial expertise they don't have
 - No way to find natural counterparties (a bakery can't find a sugar refinery)
 - Expensive legal costs for bilateral agreements
+- This is why every year around 10% of businesses in the U.S. file for bankruptcy
 
 **The gap:** 33.2 million US SMEs (99.9% of businesses) face trillions in unhedged risk. The $600 trillion derivatives market is built for institutions, not them. [Illustrated in The Big Short.](https://www.youtube.com/watch?v=rN7BmmXfUiU)
 
