@@ -4,6 +4,17 @@
 
 > Bringing Wall Street's hedging tools to Main Street through event contracts.
 
+## 🎬 Quick Start - Watch the Demo!
+
+Visit the homepage and click **"Watch Demo"** for an automated walkthrough showing:
+- Sweet Treats Bakery business profile
+- AI risk analysis detecting sugar price exposure
+- Custom contract creation in plain English
+- Smart contract generation and deployment
+- Complete flow in under 2 minutes - no interaction needed!
+
+Or visit `/demo` directly to see the entire platform in action.
+
 ---
 
 ## The Problem
