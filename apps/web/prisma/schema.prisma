@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  wallet    String?  @unique
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+enum Direction {
+  LONG
+  SHORT
+}
+
+model Order {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  underlying String     // e.g., SUGAR_USD
+  direction  Direction
+  strikeMin  Decimal    @db.Decimal(20, 8)
+  strikeMax  Decimal    @db.Decimal(20, 8)
+  notional   Decimal    @db.Decimal(20, 8)
+  expiry     DateTime
+  tolDays    Int        @default(7)
+  status     String     // OPEN | MATCHED | COUNTERING | AGREED | ONCHAIN_INIT | FUNDED_A | FUNDED_B | LIVE | SETTLED | CANCELLED
+  createdAt  DateTime   @default(now())
+
+  matchesA Match[] @relation("OrderA")
+  matchesB Match[] @relation("OrderB")
+
+  @@index([underlying, direction, expiry])
+}
+
+model Match {
+  id            String        @id @default(cuid())
+  orderAId      String
+  orderA        Order         @relation("OrderA", fields: [orderAId], references: [id], onDelete: Cascade)
+  orderBId      String
+  orderB        Order         @relation("OrderB", fields: [orderBId], references: [id], onDelete: Cascade)
+  strike        Decimal?      @db.Decimal(20, 8)
+  notional      Decimal?      @db.Decimal(20, 8)
+  expiry        DateTime?
+  state         String        // MATCHED | COUNTERING | AGREED
+  score         Float?
+  bestTermsHash String?
+  createdAt     DateTime      @default(now())
+
+  negotiations Negotiation[]
+  contract     Contract?
+
+  @@index([orderAId])
+  @@index([orderBId])
+  @@index([state])
+}
+
+model Negotiation {
+  id          String   @id @default(cuid())
+  matchId     String
+  match       Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  proposerId  String
+  strike      Decimal  @db.Decimal(20, 8)
+  notional    Decimal  @db.Decimal(20, 8)
+  expiry      DateTime
+  termsHash   String   @index
+  message     String?
+  createdAt   DateTime @default(now())
+
+  signatures NegotiationSignature[]
+}
+
+model NegotiationSignature {
+  id          String      @id @default(cuid())
+  termsHash   String      @index
+  userId      String
+  pubkey      String
+  signature   String
+  createdAt   DateTime    @default(now())
+
+  @@unique([termsHash, userId])
+  @@index([termsHash])
+}
+
+model Contract {
+  id            String   @id @default(cuid())
+  matchId       String   @unique
+  match         Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  programId     String
+  contractPda   String
+  escrowPda     String
+  oracleFeed    String   // Pyth price feed pubkey
+  usdcMint      String
+  state         String   // INIT | PARTIALLY_FUNDED | LIVE | SETTLED | CANCELLED
+  createdAt     DateTime @default(now())
+
+  transactions TxLedger[]
+}
+
+model TxLedger {
+  id          String   @id @default(cuid())
+  contractId  String
+  contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  sig         String   @unique
+  kind        String   // INIT | FUND_A | FUND_B | SETTLE | CANCEL
+  status      String   // SENT | CONFIRMED | FAILED
+  meta        Json?
+  createdAt   DateTime @default(now())
+
+  @@index([contractId])
+  @@index([sig])
+  @@index([status])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  entityType  String   // Order | Match | Contract
+  entityId    String
+  action      String   // CREATE | UPDATE | DELETE | SETTLE
+  userId      String?
+  metadata    String?  // JSON string
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model IdempotencyKey {
+  id        String   @id @default(cuid())
+  key       String
+  userId    String
+  result    String?  // JSON string of response
+  createdAt DateTime @default(now())
+
+  @@unique([key, userId])
+  @@index([userId, createdAt])
+}
+
+model RateLimit {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  createdAt DateTime @default(now())
+
+  @@index([userId, endpoint, createdAt])
+}
