@@ -24,14 +24,9 @@ exports.SOLANA_CONFIG = {
 // IMPORTANT: Use the "Crypto" asset class feeds (not Equity.US or other markets)
 // These are Feed IDs, not account addresses. Account addresses are derived using the SDK.
 exports.PYTH_FEED_IDS = {
-    // Feed IDs are the same across all networks
-    // Verify these at https://pyth.network/developers/price-feed-ids (select "Crypto" asset class)
     BTC_USD: '0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43',
     ETH_USD: '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
     SOL_USD: '0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d',
-    // If you found a different BTC/USD ID, it might be from a different market
-    // For example: 0xb3a76e70... could be an equity or futures market
-    // For crypto spot prices, use the IDs above from the "Crypto" asset class
 };
 // Pyth Program ID (same on all Solana networks)
 exports.PYTH_PROGRAM_ID = 'gSbePebfvPy7tRqimPoVecS2UsBvYv46ynrzWocc92s';
