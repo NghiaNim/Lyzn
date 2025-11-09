@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyHMAC } from '@/lib/shared/utils';
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/contracts/due
  * Returns contracts that are due for settlement (expired and in LIVE state)

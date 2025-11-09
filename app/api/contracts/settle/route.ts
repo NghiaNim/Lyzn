@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey, Transaction, Keypair } from '@solana/web3.js';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/contracts/settle
  * Settles a contract by:

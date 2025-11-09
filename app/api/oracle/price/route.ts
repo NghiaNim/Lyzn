@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { getPythFeedId, PYTH_PROGRAM_ID } from '@/lib/shared/constants';
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/oracle/price?feed=BTC_USD
  * Fetches REAL price from Pyth oracle on Solana

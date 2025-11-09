@@ -8,6 +8,9 @@ import { checkIdempotency, storeIdempotency } from '@/lib/idempotency';
 import { checkNotionalLimit } from '@/lib/notional-limits';
 import { getSupabaseServer } from '@/lib/supabase-server';
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic';
+
 const CreateOrderSchema = z.object({
   underlying: z.string(),
   direction: z.enum(['LONG', 'SHORT']),
