@@ -1,0 +1,7 @@
+target/
+.anchor/
+test-ledger/
+*.so
+.DS_Store
+.env
+

@@ -1,251 +1,352 @@
-# LYZN
+# Lyzn - Non-Custodial Risk Exchange Platform
 
-**Peer-to-Peer Risk Management for Small Businesses**
+A production-ready monorepo for a non-custodial risk exchange platform built on Solana. Users create orders, negotiate terms off-chain, and settle contracts on-chain using Pyth oracle prices.
 
-> Bringing Wall Street's hedging tools to Main Street through event contracts.
+## Architecture
 
-## 🎬 Quick Start - Watch the Demo!
+The monorepo consists of three main applications:
 
-Visit the homepage and click **"Watch Demo"** for an automated walkthrough showing:
-- Sweet Treats Bakery business profile
-- AI risk analysis detecting sugar price exposure
-- Custom contract creation in plain English
-- Smart contract generation and deployment
-- Complete flow in under 2 minutes - no interaction needed!
+1. **apps/web** - Next.js (App Router) application with:
+   - Prisma + Supabase PostgreSQL for order/contract management
+   - NextAuth for authentication
+   - REST API for orders, counters, contracts, and matching
+   - Non-custodial first design (client signs transactions)
 
-Or visit `/demo` directly to see the entire platform in action.
+2. **apps/chain-adapter** - Go service that:
+   - Builds and submits Solana transactions
+   - Runs schedulers for contract expiry and settlement
+   - Handles retries and idempotent operations
+   - HMAC authentication for server-to-server communication
 
----
+3. **programs/risk-exchange** - Solana Anchor program (Rust) that:
+   - Manages escrowed USDC for contracts
+   - Integrates with Pyth oracle for price feeds
+   - Handles contract lifecycle: initialize → fund → activate → settle
 
-## The Problem
+## Prerequisites
 
-Small businesses get crushed by price volatility they can't control. When a bakery's sugar costs spike 40%, their margins evaporate. When a restaurant's currency costs swing, they can't forecast expenses. Unlike Fortune 500 companies, SMEs have **no way to protect themselves**:
+- **Node.js** >= 18.0.0
+- **pnpm** >= 8.0.0
+- **Go** >= 1.22
+- **Rust** and **Anchor** (for Solana programs)
+- **Docker** and **Docker Compose** (for local services)
+- **Solana CLI** tools
+- **Supabase account** (for PostgreSQL database)
 
-- Derivatives markets require $100K+ minimums
-- Too complex—requires financial expertise they don't have
-- No way to find natural counterparties (a bakery can't find a sugar refinery)
-- Expensive legal costs for bilateral agreements
+## Quick Start
 
-**The gap:** 33.2 million US SMEs (99.9% of businesses) face trillions in unhedged risk. The $600 trillion derivatives market is built for institutions, not them. [Illustrated in The Big Short.](https://www.youtube.com/watch?v=rN7BmmXfUiU)
+### 1. Clone and Install Dependencies
 
----
+```bash
+# Clone the repository
+git clone <repository-url>
+cd Lyzn
 
-## The Solution: LYZN
+# Install root dependencies
+pnpm install
 
-LYZN matches businesses whose risks naturally offset each other—then automates everything with AI and smart contracts.
-
-### How It Works
-
-1. **AI Risk Assessment** - Chat with AI about your business. It identifies your key price exposures (commodities, currency, fuel) and suggests specific risks to hedge.
-
-2. **Browse Existing Contracts** - See contracts from other businesses that match your needs. If there's a good match, buy directly or negotiate better terms.
-
-3. **Create New Contract (if needed)** - If no existing contract fits, create your own. AI handles everything: contract structure, payout logic, oracle selection, and pricing.
-
-4. **Smart Contract Execution** - Both parties deposit collateral. Funds held in trustless escrow until expiry.
-
-5. **Automatic Settlement** - Oracle reports the actual price at expiry. Smart contract pays out automatically—no manual intervention needed.
-
-### Natural Counterparty Examples
-
-- **Bakery ↔ Sugar Refinery:** One hedges rising prices, other falling
-- **US Importer ↔ EU Exporter:** Opposite currency exposure
-- **Construction Co. ↔ Solar Installer:** Oil prices affect them inversely
-
----
-
-## Understanding Event Contracts & Regulation
-
-### What Are Event Contracts?
-
-Event contracts are classified as **swaps** under the Commodity Exchange Act (CEA):
-
-> "A swap is an agreement, contract, or transaction that provides for payment dependent on the occurrence, nonoccurrence, or the extent of the occurrence of an event or contingency associated with a potential financial, economic, or commercial consequence."
-> 
-> — Commodity Exchange Act, 7 U.S.C. § 1a(47)
-
-The CFTC views event contracts as **binary options**—contracts where the payout depends entirely on a yes/no proposition. Since binary options fit the legal definition of swaps, they fall under CFTC jurisdiction, [though without the price and complexity of certain famous swaps](https://www.youtube.com/watch?v=UqYGWXMJ78I)
-
-### Why This Is Legal (Not Gambling)
-
-Under the Commodity Exchange Act, derivatives exist outside gambling law because they serve an **economic purpose**: helping businesses manage legitimate risks. Airlines hedge jet fuel, coffee shops hedge coffee prices—LYZN brings this same risk management to all SMEs.
-
-### Regulatory Path
-
-- **Now (Hackathon):** Demo with no real money
-- **Phase 2:** Apply for Designated Contract Market (DCM) registration
-- **Phase 3:** Full compliance infrastructure: AML/KYC, market surveillance, customer fund segregation
-
-The 2024 Kalshi v. CFTC court victory established that event contracts are permissible financial instruments. The court ruled that the CFTC overstepped its authority in blocking event contracts, creating momentum for innovation in this space.
-
----
-
-## Demo Features
-
-Our hackathon demo shows the complete flow:
-
-**1. Chat with AI:** 
-```
-User: "I run a bakery in Brooklyn."
-
-AI: "Great! I'd love to understand your business better. 
-What are your main ingredients and supplies?"
-
-User: "We use a lot of sugar, wheat flour, and butter. 
-Also diesel for our delivery trucks."
-
-AI: "Got it. How much do you typically spend on these each month?"
-
-User: "Sugar is about $2,000/month, flour $1,500, butter $800."
-
-AI: "And how do price changes affect you? For example, 
-what happens if sugar prices spike?"
-
-User: "Last year sugar went up 40% and we almost went under. 
-We couldn't raise prices fast enough."
-
-AI: "I understand—that's a real risk. Let me show you 
-some ways to protect against these price swings."
+# Install Go dependencies
+cd apps/chain-adapter
+go mod download
+cd ../..
 ```
 
-**2. AI Suggests Risks with Available Contracts:**
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Risk #1: Sugar Prices Rising
+### 2. Setup Supabase Database
 
-Available Contracts:
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to Project Settings → Database
+3. Copy the connection string (format: `postgresql://postgres:[PASSWORD]@[PROJECT_REF].supabase.co:5432/postgres`)
+4. Add it to your `.env` file (see step 3)
 
-┌─────────────────────────────────────────────────┐
-│ 🍬 Will sugar exceed $0.55/lb by May 2026?      │
-├─────────────────────────────────────────────────┤
-│ Yes · Sugar Refinery (Louisiana)                │
-│ Contracts: 100  Avg Price: 45¢  Cost: $450      │
-│ Payout if right: $1,000                          │
-│                                                  │
-│ [Buy Now] [Negotiate Terms]                      │
-└─────────────────────────────────────────────────┘
+### 3. Configure Environment Variables
 
-┌─────────────────────────────────────────────────┐
-│ 🍬 Will sugar exceed $0.60/lb by Aug 2026?      │
-├─────────────────────────────────────────────────┤
-│ Yes · Candy Manufacturer (Ohio)                 │
-│ Contracts: 50  Avg Price: 32¢  Cost: $320       │
-│ Payout if right: $1,000                          │
-│                                                  │
-│ [Buy Now] [Negotiate Terms]                      │
-└─────────────────────────────────────────────────┘
+```bash
+# Copy example environment file
+cp .env.example .env
 
-[+ Create Your Own Sugar Contract]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Risk #2: Wheat Flour Prices Rising
-
-Available Contracts:
-
-┌─────────────────────────────────────────────────┐
-│ 🌾 Will wheat exceed $8/bushel by Jun 2026?     │
-├─────────────────────────────────────────────────┤
-│ Yes · Wheat Farmer (Kansas)                     │
-│ Contracts: 75  Avg Price: 52¢  Cost: $520       │
-│ Payout if right: $1,000                          │
-│                                                  │
-│ [Buy Now] [Negotiate Terms]                      │
-└─────────────────────────────────────────────────┘
-
-[+ Create Your Own Wheat Contract]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Risk #3: Diesel Fuel Costs (Delivery Trucks)
-
-No existing contracts found.
-
-[+ Create Your Own Diesel Contract]
+# Edit .env and fill in your values:
+# - DATABASE_URL (from Supabase)
+# - NEXTAUTH_SECRET (generate with: openssl rand -base64 32)
+# - HMAC_SECRET (generate with: openssl rand -base64 32)
+# - Other values as needed
 ```
 
-**3. Create New Contract (If you choose "Create Your Own"):**
-```
-AI generates your custom contract:
+### 4. Start Docker Services
 
-┌─────────────────────────────────────────────────┐
-│ 🍬 Will sugar exceed $0.55/lb by May 2026?      │
-├─────────────────────────────────────────────────┤
-│ Your Position: YES (you get paid if sugar rises)│
-│ Protection Amount: $5,000                        │
-│ Your Cost: $500 (10% deposit)                    │
-│ Oracle: USDA Agricultural Prices API             │
-│ Settlement: Automatic via smart contract         │
-│                                                  │
-│ [Post Contract] [Adjust Terms]                   │
-└─────────────────────────────────────────────────┘
+```bash
+# Start Postgres, Redis, and Solana test validator
+docker-compose up -d
 
-This contract will be visible to other businesses 
-looking for the opposite hedge.
+# Verify services are running
+docker-compose ps
 ```
 
-**4. Execution:** Both parties deposit funds into smart contract escrow
+The Solana test validator will be available at `http://localhost:8899`
 
-**5. Settlement:**
+### 5. Setup Database
+
+```bash
+# Generate Prisma client
+cd apps/web
+pnpm db:generate
+
+# Run migrations
+pnpm db:migrate
+
+# (Optional) Open Prisma Studio to view data
+pnpm db:studio
 ```
-Contract Settled! 
-Final sugar price: $0.60/lb (above strike of $0.55/lb)
-Your payout: $5,000 (automatically transferred)
-```  
 
----
+### 6. Build Solana Program
 
-## Business Model
+```bash
+# Build the Anchor program
+cd programs/risk-exchange
+anchor build
 
-**Revenue:** We take a 1% fee on each matched contract.
+# The program ID will be printed - update it in:
+# - programs/risk-exchange/declare_id!() in src/lib.rs
+# - .env PROGRAM_ID
+# - apps/chain-adapter/.env PROGRAM_ID
+```
 
-**Why 1%:** Traditional OTC derivatives desks charge 2-5%. We're cheaper because we cut out the middleman—peer-to-peer matching means lower costs.
+### 7. Fund Dev Wallets
 
-**Example:** $10K contract → $100 platform fee
+#### Local Validator (Recommended for Development)
 
-Simple, transparent, aligned with helping SMEs save money.
+```bash
+# Start local validator (already running via docker-compose)
+# Get airdrop for your wallet
+solana airdrop 10 $(solana address) --url http://localhost:8899
 
----
+# Check balance
+solana balance --url http://localhost:8899
+```
 
-## Go-to-Market
+#### Devnet (Alternative)
 
-**Target:** Start with food & beverage SMEs (bakeries, restaurants, cafes)
-- Clear commodity risks (sugar, wheat, coffee)
-- Easy to understand pain points
-- Natural counterparties exist (farmers, processors, suppliers)
+```bash
+# Switch to devnet
+solana config set --url devnet
 
-**Acquisition:**
-1. Partner with trade associations (National Restaurant Association, American Bakers Association)
-2. SME banking partnerships (offer as value-add to business account holders)
-3. Content marketing: "How to protect your bakery from price spikes"
-4. Referral program: Users bring their natural counterparties
+# Airdrop SOL
+solana airdrop 2 $(solana address)
 
----
+# Create and fund USDC token account
+# TODO: Use devnet USDC faucet or create test USDC mint
+```
 
-## Why Now?
+### 8. Start Development Servers
 
-Three technologies converged to make this possible:
+```bash
+# From project root, start all services
+make dev
 
-1. **LLMs** - Can translate "my sugar costs are killing me" into structured financial contracts
-2. **Smart Contracts** - Provide trustless escrow at near-zero cost
-3. **Regulatory Clarity** - Kalshi's 2024 court victory legitimized event contracts
+# Or start individually:
+# Terminal 1: Next.js app
+make web
+# or: cd apps/web && pnpm dev
 
----
+# Terminal 2: Go chain-adapter
+make adapter
+# or: cd apps/chain-adapter && go run ./main.go
+```
 
-## The Vision
+## Development
 
-The derivatives market is $600 trillion, but 99% of businesses are excluded.
+### Available Make Targets
 
-**LYZN brings institutional hedging to Main Street.** A bakery in Brooklyn, a coffee shop in Seattle, a food truck in Austin—all can protect themselves like Fortune 500 companies do.
+```bash
+make help          # Show all available targets
+make dev           # Start all services
+make web           # Start Next.js app only
+make adapter       # Start Go service only
+make program-build # Build Solana program
+make program-test  # Test Solana program
+make db-migrate    # Run database migrations
+make db-studio     # Open Prisma Studio
+make clean         # Clean all build artifacts
+make docker-up     # Start Docker services
+make docker-down   # Stop Docker services
+```
 
-This isn't just a product. It's **financial inclusion for the 33 million SMEs that need it most**.
+### Project Structure
 
----
+```
+.
+├── apps/
+│   ├── web/              # Next.js application
+│   │   ├── src/
+│   │   │   ├── app/      # App router pages and API routes
+│   │   │   └── lib/      # Utilities (Prisma, auth, etc.)
+│   │   └── prisma/       # Database schema and migrations
+│   └── chain-adapter/    # Go service
+│       ├── internal/
+│       │   ├── api/      # HTTP API handlers
+│       │   ├── solana/   # Solana client
+│       │   └── scheduler/# Expiry/settlement schedulers
+│       └── main.go
+├── packages/
+│   └── shared/           # Shared TypeScript types and utilities
+├── programs/
+│   └── risk-exchange/    # Solana Anchor program
+│       └── src/lib.rs    # On-chain contract logic
+├── docker-compose.yml    # Local services (Postgres, Redis, Solana)
+└── Makefile              # Common development tasks
+```
 
-## Team & Contact
+## API Endpoints
 
-1. **Built at:** HackPrinceton
-2. **Team:** Crystal (L)ow, Angelina (Y)eh, Anna (Z)hang, (N)ghia Nim
-3. **Contact:** nghia.nim@columbia.edu
+### Web API (Next.js)
 
----
+- `GET /api/orders` - List orders (with filters)
+- `POST /api/orders` - Create new order
+- `GET /api/orders/[id]` - Get order details
+- `POST /api/match/candidates` - Find match candidates
+- `GET /api/matches/[id]` - Get match/negotiation thread
+- `POST /api/matches/[id]/counter` - Create counter proposal
+- `POST /api/matches/[id]/sign` - Sign terms (creates contract)
+- `POST /api/contracts/initialize` - Initialize contract on-chain
+- `GET /api/contracts/due` - Get contracts due for settlement (S2S)
 
-**Let's bring institutional hedging to Main Street.**
+### Chain Adapter API (Go)
+
+- `POST /v1/contracts/initialize` - Initialize contract on-chain
+- `POST /v1/contracts/{id}/fund` - Fund contract escrow
+- `POST /v1/contracts/{id}/settle` - Settle contract
+- `POST /v1/contracts/{id}/submit-signed` - Submit signed transaction
+- `GET /v1/health` - Health check
+
+All chain-adapter endpoints require HMAC authentication:
+- `X-Timestamp`: Unix timestamp in milliseconds
+- `X-Signature`: HMAC-SHA256 signature of `{timestamp}.{body}`
+
+## Workflow
+
+1. **Order Creation**: User creates an order (hedge/speculative, long/short, strike range, expiry, notional)
+2. **Matching**: System proposes potential matches (opposite direction, same underlying)
+3. **Negotiation**: Parties exchange counter proposals off-chain until both agree on terms
+4. **Contract Creation**: Once both parties sign the same `terms_hash`, a contract is created
+5. **On-Chain Initialization**: Chain-adapter initializes the contract on Solana (creates escrow PDA)
+6. **Funding**: Both parties fund the escrow with USDC
+7. **Activation**: Contract goes live once both parties have funded
+8. **Settlement**: At expiry, scheduler reads Pyth oracle price and settles the contract
+9. **Payout**: Winner receives funds, remainder refunded to both parties
+
+## Testing
+
+### Test Solana Program
+
+```bash
+cd programs/risk-exchange
+anchor test
+```
+
+### Test Go Service
+
+```bash
+cd apps/chain-adapter
+go test ./...
+```
+
+### Test Next.js App
+
+```bash
+cd apps/web
+pnpm test
+```
+
+## Environment Variables
+
+See `.env.example` for all required environment variables. Key variables:
+
+- `DATABASE_URL` - Supabase PostgreSQL connection string
+- `NEXTAUTH_SECRET` - Secret for NextAuth sessions
+- `HMAC_SECRET` - Secret for server-to-server HMAC auth
+- `RPC_PRIMARY` - Primary Solana RPC endpoint
+- `PROGRAM_ID` - Deployed Solana program ID
+- `NON_CUSTODIAL` - Enable/disable custodial mode
+
+## Security Features
+
+- **HMAC Authentication**: All S2S communication uses HMAC-SHA256
+- **Idempotency Keys**: All POST mutators support idempotency
+- **Rate Limiting**: Sensitive endpoints are rate-limited
+- **Notional Limits**: Per-user daily notional limits enforced
+- **Audit Trail**: All operations logged for compliance
+
+See [SECURITY.md](./SECURITY.md) for detailed security documentation.
+
+## Deployment
+
+### Prerequisites
+
+- Deploy Solana program to devnet/mainnet
+- Update `PROGRAM_ID` in environment variables
+- Configure production Supabase database
+- Set up production RPC endpoints
+- Configure KMS for custodial mode (if used)
+
+### Steps
+
+1. Build all applications:
+   ```bash
+   pnpm build
+   cd apps/chain-adapter && make build
+   cd programs/risk-exchange && anchor build
+   ```
+
+2. Deploy Solana program:
+   ```bash
+   cd programs/risk-exchange
+   anchor deploy --provider.cluster mainnet
+   ```
+
+3. Run database migrations:
+   ```bash
+   cd apps/web
+   pnpm db:migrate
+   ```
+
+4. Deploy applications to your hosting platform (Vercel, Railway, etc.)
+
+## Troubleshooting
+
+### Database Connection Issues
+
+- Verify Supabase connection string is correct
+- Check Supabase project is active
+- Ensure IP is whitelisted in Supabase (if using IP restrictions)
+
+### Solana RPC Issues
+
+- For local development, ensure validator is running: `docker-compose ps`
+- Check RPC URL in `.env` matches your setup
+- For devnet, use public RPC or get API key from QuickNode/Alchemy
+
+### Program Build Issues
+
+- Ensure Anchor is installed: `anchor --version`
+- Run `anchor build` from `programs/risk-exchange` directory
+- Check Rust toolchain: `rustc --version`
+
+### Port Conflicts
+
+- Next.js default: 3000
+- Chain-adapter default: 8080
+- Solana validator: 8899
+- Postgres: 5432
+- Redis: 6379
+
+Change ports in `.env` or `docker-compose.yml` if needed.
+
+## Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Test thoroughly
+4. Submit a pull request
+
+## License
+
+See LICENSE file for details.
