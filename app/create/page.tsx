@@ -251,8 +251,12 @@ function CreateContractForm() {
       oracle = 'EIA Energy Price Data'
     }
     
+    // Format expiry date
+    const expiryDate = new Date(data.expiry)
+    const expiryMonth = expiryDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    
     const contract = {
-      title: `Will ${data.commodity.toLowerCase()} exceed $${data.strikePrice} by ${data.expiry}?`,
+      title: `Will ${data.commodity.toLowerCase()} exceed $${data.strikePrice}/lb by ${expiryMonth.split(' ')[0]} ${expiryMonth.split(' ')[1]}?`,
       position: data.position,
       protectionAmount: data.protectionAmount,
       cost: Math.round(parseFloat(data.protectionAmount) * 0.1),
