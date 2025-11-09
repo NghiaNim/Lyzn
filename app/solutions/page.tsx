@@ -219,7 +219,7 @@ export default function SolutionsPage() {
             <p className="text-xl text-gray-300 mb-6">
               Our AI can identify and hedge risks for any business type
             </p>
-            <Link href="/chat" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300 inline-block">
+            <Link href="/chat" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300 inline-block cursor-pointer">
               Chat with AI to Explore Your Options
             </Link>
           </div>

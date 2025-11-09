@@ -202,7 +202,7 @@ export default function MarketplacePage() {
                 <h3 className="text-xl font-semibold mb-2">Can&apos;t find what you need?</h3>
                 <p className="text-gray-300">Create a custom contract and let AI handle the details</p>
               </div>
-              <Link href="/create" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300">
+              <Link href="/create" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300 cursor-pointer">
                 Create Contract
               </Link>
             </div>

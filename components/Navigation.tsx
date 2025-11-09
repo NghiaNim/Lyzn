@@ -56,7 +56,7 @@ export default function Navigation() {
             </Link>
             <Link 
               href="/login" 
-              className="text-sm font-medium px-6 py-2.5 bg-white text-slate-900 rounded-lg hover:bg-blue-600 hover:text-white transition-all duration-300 hover:scale-105"
+              className="text-sm font-medium px-6 py-2.5 bg-white text-slate-900 rounded-lg hover:bg-blue-600 hover:text-white transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               Client Portal
             </Link>

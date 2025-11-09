@@ -190,7 +190,7 @@ export default function Home() {
             <div className="hero-cta flex gap-6 justify-center items-center">
               <Link 
                 href="/demo" 
-                className="group relative px-10 py-5 bg-white text-slate-900 rounded-lg font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20"
+                className="group relative px-10 py-5 bg-white text-slate-900 rounded-lg font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 hover:bg-blue-600 hover:text-white cursor-pointer"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   View Platform Demo
