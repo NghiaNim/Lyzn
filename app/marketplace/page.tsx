@@ -21,10 +21,37 @@ export default function MarketplacePage() {
   })
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-950">
       <Navigation />
       
-      <div className="pt-24 pb-12 px-6">
+      {/* Background Image with Overlay */}
+      <div className="fixed inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/building-bg.jpg)'
+          }}
+        />
+        <div className="absolute inset-0 bg-slate-950/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/40"></div>
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+      </div>
+
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-1/4 -right-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="relative pt-24 pb-12 px-6 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">Contract Marketplace</h1>
@@ -33,21 +60,21 @@ export default function MarketplacePage() {
 
           {/* Stats Bar */}
           <div className="grid grid-cols-4 gap-4 mb-8">
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <p className="text-sm text-gray-400 mb-1">Total Contracts</p>
               <p className="text-2xl font-bold">{allContracts.length}</p>
             </div>
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <p className="text-sm text-gray-400 mb-1">24h Volume</p>
               <p className="text-2xl font-bold">
                 ${(allContracts.reduce((sum, c) => sum + c.volume24h, 0) / 1000).toFixed(0)}K
               </p>
             </div>
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <p className="text-sm text-gray-400 mb-1">Active Users</p>
               <p className="text-2xl font-bold">1,247</p>
             </div>
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <p className="text-sm text-gray-400 mb-1">Avg Protection</p>
               <p className="text-2xl font-bold">$5,000</p>
             </div>
@@ -87,7 +114,7 @@ export default function MarketplacePage() {
           {/* Contracts Grid */}
           <div className="space-y-4">
             {filteredContracts.map((contract) => (
-              <div key={contract.id} className="card hover:border-blue-500 transition-colors">
+              <div key={contract.id} className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 hover:border-blue-500 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-start gap-3 mb-3">
@@ -160,7 +187,7 @@ export default function MarketplacePage() {
           </div>
 
           {filteredContracts.length === 0 && (
-            <div className="card text-center py-12">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 text-center py-12">
               <p className="text-gray-400 mb-4">No contracts found matching your search.</p>
               <Link href="/create" className="btn-primary inline-block">
                 Create Your Own Contract
@@ -169,13 +196,13 @@ export default function MarketplacePage() {
           )}
 
           {/* CTA */}
-          <div className="mt-8 card bg-gradient-to-r from-blue-600 to-blue-800">
+          <div className="mt-8 card bg-slate-900/40 backdrop-blur-sm border-slate-800">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Can&apos;t find what you need?</h3>
-                <p className="text-blue-100">Create a custom contract and let AI handle the details</p>
+                <p className="text-gray-300">Create a custom contract and let AI handle the details</p>
               </div>
-              <Link href="/create" className="btn-secondary bg-white text-blue-600 hover:bg-gray-100">
+              <Link href="/create" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300">
                 Create Contract
               </Link>
             </div>
