@@ -309,9 +309,11 @@ function NegotiationChatFlow({
         }
         
         if (step.action) {
-          step.action(setNegotiatedOffer)
+          // Last step sets showButtons, others update the offer
           if (i === conversationFlow.length - 1) {
             step.action(setShowButtons)
+          } else {
+            step.action(setNegotiatedOffer)
           }
         }
       }
