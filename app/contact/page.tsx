@@ -12,7 +12,7 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold mb-6 text-center">Get in Touch</h1>
           <p className="text-xl text-gray-300 text-center mb-16">
-            Have questions? We'd love to hear from you.
+            Have questions? We&apos;d love to hear from you.
           </p>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">

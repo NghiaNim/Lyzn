@@ -58,7 +58,7 @@ export default function LoginPage() {
                   className="w-4 h-4 rounded bg-slate-700 border-gray-600"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-gray-400">
-                  I'm not a robot
+                  I&apos;m not a robot
                 </label>
               </div>
 

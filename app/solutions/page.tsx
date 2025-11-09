@@ -188,7 +188,7 @@ export default function SolutionsPage() {
 
           {/* CTA */}
           <div className="card bg-gradient-to-r from-blue-600 to-blue-800 text-center">
-            <h2 className="text-3xl font-bold mb-4">Don't See Your Industry?</h2>
+            <h2 className="text-3xl font-bold mb-4">Don&apos;t See Your Industry?</h2>
             <p className="text-xl text-blue-100 mb-6">
               Our AI can identify and hedge risks for any business type
             </p>
