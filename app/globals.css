@@ -1,10 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-slate-900 text-white;
+    @apply bg-slate-950 text-white;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Libre Baskerville', 'Baskerville', 'Georgia', 'Times New Roman', serif;
+    letter-spacing: 0.08em;
+    font-weight: 400;
+    text-transform: none;
+  }
+  
+  h1 {
+    font-weight: 400;
+    letter-spacing: 0.15em;
+  }
+  
+  h2 {
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+  
+  h3, h4, h5, h6 {
+    font-weight: 400;
+    letter-spacing: 0.05em;
   }
 }
 

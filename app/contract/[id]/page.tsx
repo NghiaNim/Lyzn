@@ -4,20 +4,41 @@ import Navigation from '@/components/Navigation'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TrendingUp, Calendar, DollarSign, Shield, CheckCircle } from 'lucide-react'
+import { useContracts } from '@/contexts/ContractContext'
 
 export default function ContractDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
+  const { contracts, purchaseContract } = useContracts()
   const [quantity, setQuantity] = useState(1)
   const [step, setStep] = useState<'details' | 'deposit' | 'confirmed'>('details')
 
-  // Mock contract data - in real app this would come from API
-  const contract = {
+  // Find the contract from the context
+  const contractFromContext = contracts.find(c => c.id === params.id)
+  
+  // Mock contract data - merge with context data if available
+  const contract = contractFromContext ? {
+    id: contractFromContext.id,
+    title: contractFromContext.title,
+    category: contractFromContext.category,
+    counterparty: contractFromContext.counterparty,
+    location: contractFromContext.location,
+    position: contractFromContext.position,
+    contracts: contractFromContext.contracts,
+    avgPrice: contractFromContext.avgPrice,
+    cost: contractFromContext.cost,
+    payout: contractFromContext.payout,
+    expiry: contractFromContext.expiry === 'May 2026' ? 'May 31, 2026' : contractFromContext.expiry,
+    oracle: 'USDA Agricultural Prices API',
+    currentPrice: 0.48,
+    strikePrice: 0.55,
+    description: `This contract protects against ${contractFromContext.category.toLowerCase()} price increases. If the condition is met, ${contractFromContext.position} holders receive $${contractFromContext.payout.toLocaleString()} per contract.`,
+  } : {
     id: params.id,
     title: 'Will sugar exceed $0.55/lb by May 2026?',
     category: 'Commodities',
     counterparty: 'Sugar Refinery',
     location: 'Louisiana',
-    position: 'YES',
+    position: 'YES' as 'YES' | 'NO',
     contracts: 100,
     avgPrice: 0.45,
     cost: 450,
@@ -36,6 +57,8 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
   const handleConfirmDeposit = () => {
     // Simulate blockchain transaction
     setTimeout(() => {
+      // Update the contract list by removing the purchased quantity
+      purchaseContract(params.id, quantity)
       setStep('confirmed')
     }, 2000)
   }
@@ -328,7 +351,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                         3
                       </div>
                       <p className="text-gray-300">
-                        If sugar exceeds ${contract.strikePrice}/lb, you'll receive ${contract.payout * quantity} automatically.
+                        If sugar exceeds ${contract.strikePrice}/lb, you&apos;ll receive ${contract.payout * quantity} automatically.
                       </p>
                     </div>
                   </div>

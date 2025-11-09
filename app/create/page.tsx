@@ -1,11 +1,11 @@
 'use client'
 
 import Navigation from '@/components/Navigation'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Sparkles, Info, Loader2 } from 'lucide-react'
 
-export default function CreateContractPage() {
+function CreateContractForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const risk = searchParams.get('risk') || ''
@@ -401,3 +401,24 @@ export default function CreateContractPage() {
     </div>
   )
 }
+
+export default function CreateContractPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="pt-24 pb-12 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2">Create Custom Contract</h1>
+              <p className="text-gray-400">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <CreateContractForm />
+    </Suspense>
+  )
+}
+

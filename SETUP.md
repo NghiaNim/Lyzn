@@ -16,7 +16,7 @@ sudo chown -R $(whoami) ~/.npm
 # Navigate to project directory
 cd /Users/angelinayeh/Lyzn
 
-# Install dependencies
+# Install dependencies (includes GSAP for animations)
 npm install --legacy-peer-deps
 
 # Start development server

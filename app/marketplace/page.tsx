@@ -55,6 +55,7 @@ function orderToContract(order: any): Contract {
 }
 
 export default function MarketplacePage() {
+  const { contracts: allContracts } = useContracts()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [contracts, setContracts] = useState<Contract[]>([])
@@ -275,7 +276,7 @@ export default function MarketplacePage() {
           <div className="mt-8 card bg-gradient-to-r from-blue-600 to-blue-800">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-semibold mb-2">Can't find what you need?</h3>
+                <h3 className="text-xl font-semibold mb-2">Can&apos;t find what you need?</h3>
                 <p className="text-blue-100">Create a custom contract and let AI handle the details</p>
               </div>
               <Link href="/create" className="btn-secondary bg-white text-blue-600 hover:bg-gray-100">
