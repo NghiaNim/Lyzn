@@ -3,6 +3,8 @@
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
 import { TrendingUp, Wheat, Fuel } from 'lucide-react'
+import { purchaseContract } from '@/lib/purchaseHelper'
+import { useRouter } from 'next/navigation'
 
 interface Contract {
   id: string
@@ -27,7 +29,7 @@ const sugarContracts: Contract[] = [
     contracts: 10000,
     avgPrice: 45,
     cost: 4500,
-    payout: 1000,
+    payout: 10000,
     expiry: 'May 2026'
   },
   {
@@ -51,15 +53,17 @@ const wheatContracts: Contract[] = [
     counterparty: 'Wheat Farmer',
     location: 'Kansas',
     position: 'YES',
-    contracts: 75,
-    avgPrice: 0.52,
-    cost: 520,
-    payout: 1000,
+    contracts: 5000,
+    avgPrice: 52,
+    cost: 2600,
+    payout: 5000,
     expiry: 'Jun 2026'
   }
 ]
 
 export default function RisksPage() {
+  const router = useRouter()
+  
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -119,12 +123,28 @@ export default function RisksPage() {
                   </div>
                   
                   <div className="flex gap-3">
-                    <Link href={`/contract/${contract.id}`} className="btn-primary flex-1 text-center">
+                    <button 
+                      onClick={() => {
+                        purchaseContract({
+                          id: contract.id,
+                          title: contract.title,
+                          position: contract.position,
+                          cost: contract.cost,
+                          payout: contract.payout,
+                          expiry: contract.expiry,
+                          counterparty: contract.counterparty
+                        })
+                        
+                        alert('✅ Smart contract deployed! Position added to your dashboard.')
+                        setTimeout(() => router.push('/dashboard'), 1500)
+                      }}
+                      className="btn-primary flex-1"
+                    >
                       Buy Now
-                    </Link>
-                    <button className="btn-secondary">
-                      Negotiate Terms
                     </button>
+                    <Link href={`/negotiate/${contract.id}`} className="btn-secondary flex-1 text-center">
+                      Negotiate Terms
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -184,12 +204,28 @@ export default function RisksPage() {
                   </div>
                   
                   <div className="flex gap-3">
-                    <Link href={`/contract/${contract.id}`} className="btn-primary flex-1 text-center">
+                    <button 
+                      onClick={() => {
+                        purchaseContract({
+                          id: contract.id,
+                          title: contract.title,
+                          position: contract.position,
+                          cost: contract.cost,
+                          payout: contract.payout,
+                          expiry: contract.expiry,
+                          counterparty: contract.counterparty
+                        })
+                        
+                        alert('✅ Smart contract deployed! Position added to your dashboard.')
+                        setTimeout(() => router.push('/dashboard'), 1500)
+                      }}
+                      className="btn-primary flex-1"
+                    >
                       Buy Now
-                    </Link>
-                    <button className="btn-secondary">
-                      Negotiate Terms
                     </button>
+                    <Link href={`/negotiate/${contract.id}`} className="btn-secondary flex-1 text-center">
+                      Negotiate Terms
+                    </Link>
                   </div>
                 </div>
               ))}

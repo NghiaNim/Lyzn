@@ -353,6 +353,7 @@ function ContractAdjustmentChat({
 function ChatDemoStep({ onComplete }: { onComplete: (riskType: string) => void }) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const hasStartedRef = useRef(false)
+  const shouldStopRef = useRef(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [showRisks, setShowRisks] = useState(false)
@@ -430,21 +431,33 @@ function ChatDemoStep({ onComplete }: { onComplete: (riskType: string) => void }
     // Start conversation automatically
     const startConversation = async () => {
       for (let i = 0; i < conversationFlow.length; i++) {
+        // Check if we should stop the animation
+        if (shouldStopRef.current) {
+          break
+        }
+        
         const step = conversationFlow[i]
         
         // Add assistant message
         setIsTyping(true)
         await new Promise(resolve => setTimeout(resolve, 800))
+        
+        if (shouldStopRef.current) break
+        
         setIsTyping(false)
         
         setMessages(prev => [...prev, { role: 'assistant', content: step.assistant }])
         await new Promise(resolve => setTimeout(resolve, step.delay))
+        
+        if (shouldStopRef.current) break
         
         // Add user message if exists
         if (step.user) {
           setMessages(prev => [...prev, { role: 'user', content: step.user! }])
           await new Promise(resolve => setTimeout(resolve, 1000))
         }
+        
+        if (shouldStopRef.current) break
         
         // Execute action if exists
         if (step.action) {
@@ -481,13 +494,32 @@ function ChatDemoStep({ onComplete }: { onComplete: (riskType: string) => void }
     setConfirmedRisk(false)
   }
 
+  const handleSkip = () => {
+    // Stop the animation
+    shouldStopRef.current = true
+    setIsTyping(false)
+    
+    // Populate all messages immediately
+    const allMessages: Message[] = []
+    conversationFlow.forEach(step => {
+      allMessages.push({ role: 'assistant', content: step.assistant })
+      if (step.user) {
+        allMessages.push({ role: 'user', content: step.user })
+      }
+    })
+    setMessages(allMessages)
+    
+    // Show risks immediately
+    setShowRisks(true)
+  }
+
   return (
     <div className={`space-y-6 animate-fade-in transition-all duration-500 ${!showRisks ? 'flex flex-col items-center justify-center min-h-[60vh]' : ''}`}>
       {/* Skip Demo Button */}
       {!showRisks && (
         <div className="w-full max-w-3xl flex justify-end mb-2">
           <button
-            onClick={() => setShowRisks(true)}
+            onClick={handleSkip}
             className="text-sm text-gray-400 hover:text-white transition-colors underline"
           >
             Skip Demo Chat →
@@ -628,6 +660,7 @@ export default function DemoPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [hasAdjusted, setHasAdjusted] = useState(false)
   const [selectedRiskType, setSelectedRiskType] = useState<string>('sugar')
+  const [selectedContractId, setSelectedContractId] = useState<string | null>(null)
   const [contractParams, setContractParams] = useState<ContractParams>({
     strikePrice: '0.55',
     protectionAmount: '5000',
@@ -652,19 +685,15 @@ export default function DemoPage() {
     }
   }, [step])
 
-  // Progress bar animation
+  // Progress bar animation for deployment (happens on purchase)
   useEffect(() => {
     if (step === 'generating') {
-      let current = 0
-      const interval = setInterval(() => {
-        current += 5
-        setProgress(current)
-        if (current >= 100) {
-          clearInterval(interval)
-          setTimeout(() => setStep('review'), 500)
-        }
-      }, 100)
-      return () => clearInterval(interval)
+      // Simulate contract generation before deployment
+      const timer = setTimeout(() => {
+        setStep('deploying')
+        setProgress(0)
+      }, 3000)
+      return () => clearTimeout(timer)
     }
     if (step === 'deploying') {
       let current = 0
@@ -808,8 +837,10 @@ export default function DemoPage() {
               riskType={selectedRiskType}
               allContracts={allContracts}
               onSelectContract={(contractId) => {
-                // Navigate to contract detail page
-                window.location.href = `/contract/${contractId}`
+                // Store the selected contract and move to generating/deploying
+                setSelectedContractId(contractId)
+                setStep('generating')
+                setProgress(0)
               }}
               onCreateNew={() => setStep('contract')}
             />
@@ -910,12 +941,11 @@ export default function DemoPage() {
                 <div className="flex gap-4">
                   <button 
                     onClick={() => {
-                      setStep('generating')
-                      setProgress(0)
+                      setStep('review')
                     }}
                     className="btn-primary flex-1 text-lg"
                   >
-                    Post Contract to Marketplace
+                    Post Listing to Marketplace
                   </button>
                   <button 
                     onClick={() => setIsEditing(true)}
@@ -929,7 +959,7 @@ export default function DemoPage() {
             </div>
           )}
 
-          {/* Generating */}
+          {/* Generating - happens when buying */}
           {step === 'generating' && (
             <div className="space-y-6 animate-fade-in">
               <div className="text-center mb-8">
@@ -937,23 +967,10 @@ export default function DemoPage() {
                   <Sparkles className="w-8 h-8 animate-spin" />
                 </div>
                 <h2 className="text-3xl font-bold mb-2">Generating Smart Contract</h2>
-                <p className="text-gray-400">Please wait while we create your contract...</p>
+                <p className="text-gray-400">Creating your contract now that a match is found...</p>
               </div>
 
               <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-400">Progress</span>
-                    <span className="font-medium">{progress}%</span>
-                  </div>
-                  <div className="w-full bg-slate-700 rounded-full h-3">
-                    <div 
-                      className="bg-blue-600 h-3 rounded-full transition-all duration-200"
-                      style={{ width: `${progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <CheckCircle className="w-5 h-5 text-green-400" />
@@ -964,46 +981,46 @@ export default function DemoPage() {
                     <span className="text-gray-300">Configuring oracle data feed</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    {progress >= 50 ? (
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                    ) : (
-                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    )}
+                    <CheckCircle className="w-5 h-5 text-green-400" />
                     <span className="text-gray-300">Generating payout logic</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    {progress >= 80 ? (
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                    ) : (
-                      <div className="w-5 h-5 border-2 border-slate-600 rounded-full"></div>
-                    )}
+                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     <span className="text-gray-300">Finalizing smart contract code</span>
                   </div>
                 </div>
               </div>
+
+              <div className="card bg-blue-600/10 border-blue-500 backdrop-blur-sm">
+                <p className="text-blue-100 text-sm">
+                  <strong>💡 Smart Contract Generation:</strong> The contract is being created now that both parties 
+                  (you and the counterparty) have committed. This ensures gas costs are only paid when there&apos;s a real transaction.
+                </p>
+              </div>
             </div>
           )}
 
-          {/* Review Generated Contract */}
+          {/* Review Listing */}
           {step === 'review' && (
             <div className="space-y-6 animate-fade-in">
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">Smart Contract Generated</h2>
-                <p className="text-gray-400">Review before deployment</p>
+                <h2 className="text-3xl font-bold mb-2">Contract Listing Ready</h2>
+                <p className="text-gray-400">Review before posting to marketplace</p>
               </div>
 
               <div className="card border-green-500">
-                <h3 className="text-xl font-semibold mb-4">Contract Code Preview</h3>
+                <h3 className="text-xl font-semibold mb-4">Contract Template</h3>
                 
                 <div className="bg-slate-900 p-6 rounded-lg font-mono text-sm mb-4 overflow-x-auto">
-                  <pre className="text-green-400">{`// LYZN Event Contract
-// Auto-generated by AI
+                  <pre className="text-green-400">{`// LYZN Event Contract Template
+// Will be deployed when matched with counterparty
 
 contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.commodity.slice(1)}PriceProtection {
-  address public bakery = 0x742d35Cc6634C0532...;
+  address public bakery = <will_be_set_on_deployment>;
+  address public counterparty = <will_be_set_on_deployment>;
   uint256 public strikePrice = ${Math.round(parseFloat(contractParams.strikePrice) * 100)}; // cents per lb
   uint256 public protectionAmount = ${contractParams.protectionAmount}; // USD
   uint256 public expiryDate = ${Math.floor(new Date(contractParams.expiry).getTime() / 1000)}; // ${new Date(contractParams.expiry).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -1014,34 +1031,43 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
     require(block.timestamp >= expiryDate);
     uint256 finalPrice = oracle.getPrice("${contractParams.commodity.toUpperCase()}_USD_LB");
     
-    if (finalPrice >= strikePrice) {
-      payable(bakery).transfer(protectionAmount);
-    }
-  }
+                    if (finalPrice &gt;= strikePrice) {
+                      payable(bakery).transfer(protectionAmount);
+                    } else {
+                      payable(counterparty).transfer(protectionAmount);
+                    }
+                  }
 }`}</pre>
+                </div>
+
+                <div className="bg-blue-600/20 border border-blue-500 p-4 rounded-lg mb-4">
+                  <p className="text-blue-100">
+                    <strong>💡 How it works:</strong> Your contract listing will be posted to the marketplace. 
+                    The smart contract will only be deployed to the blockchain when a counterparty commits to buy. 
+                    This saves you gas costs if no one matches with your listing.
+                  </p>
                 </div>
 
                 <div className="bg-green-600/20 border border-green-500 p-4 rounded-lg mb-4">
                   <p className="text-green-100">
-                    <strong>✓ Contract Validated:</strong> All parameters verified. Oracle configured. 
-                    Payout logic tested. Ready for deployment.
+                    <strong>✓ Template Validated:</strong> All parameters verified. Oracle configured. 
+                    Ready to post to marketplace.
                   </p>
                 </div>
 
                 <button 
                   onClick={() => {
-                    setStep('deploying')
-                    setProgress(0)
+                    setTimeout(() => setStep('complete'), 1500)
                   }}
                   className="btn-primary w-full text-lg"
                 >
-                  Deploy Smart Contract
+                  Post Listing to Marketplace
                 </button>
               </div>
             </div>
           )}
 
-          {/* Deploying */}
+          {/* Deploying - happens on purchase */}
           {step === 'deploying' && (
             <div className="space-y-6 animate-fade-in">
               <div className="text-center mb-8">
@@ -1049,7 +1075,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                   <TrendingUp className="w-8 h-8 animate-bounce" />
                 </div>
                 <h2 className="text-3xl font-bold mb-2">Deploying to Blockchain</h2>
-                <p className="text-gray-400">Creating immutable smart contract...</p>
+                <p className="text-gray-400">Creating immutable smart contract with both parties...</p>
               </div>
 
               <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
@@ -1085,7 +1111,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                     ) : (
                       <div className="w-5 h-5 border-2 border-slate-600 rounded-full"></div>
                     )}
-                    <span className="text-gray-300">Configuring oracle connection</span>
+                    <span className="text-gray-300">Locking both parties&apos; deposits</span>
                   </div>
                   <div className="flex items-center gap-3">
                     {progress >= 100 ? (
@@ -1093,7 +1119,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                     ) : (
                       <div className="w-5 h-5 border-2 border-slate-600 rounded-full"></div>
                     )}
-                    <span className="text-gray-300">Posting to marketplace</span>
+                    <span className="text-gray-300">Configuring oracle connection</span>
                   </div>
                 </div>
 
@@ -1104,37 +1130,169 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                   </p>
                 </div>
               </div>
+
+              <div className="card bg-blue-600/10 border-blue-500 backdrop-blur-sm">
+                <p className="text-blue-100 text-sm">
+                  <strong>🎯 Match Found:</strong> Both parties have committed! The smart contract is being deployed 
+                  now with your address and the counterparty&apos;s address locked in.
+                </p>
+              </div>
             </div>
           )}
 
           {/* Complete */}
-          {step === 'complete' && (
+          {step === 'complete' && selectedContractId && (
             <div className="space-y-6 animate-fade-in">
               <div className="text-center mb-8 flex flex-col items-center">
                 <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
                   <CheckCircle className="w-12 h-12" />
                 </div>
-                <h1 className="text-5xl font-bold mb-4">Contract Live! 🎉</h1>
+                <h1 className="text-5xl font-bold mb-4">Contract Active! 🎉</h1>
                 <p className="text-xl text-gray-300 max-w-md mx-auto">
-                  Smart contract deployed and ready for matching
+                  Smart contract deployed with both parties&apos; addresses locked in
                 </p>
               </div>
 
               <div className="card border-green-500">
-                <h3 className="text-2xl font-semibold mb-4">Contract Successfully Created</h3>
+                <h3 className="text-2xl font-semibold mb-4">Contract Successfully Deployed</h3>
                 
                 <div className="bg-green-600/20 border border-green-500 p-6 rounded-lg mb-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <p className="text-sm text-green-300 mb-1">Contract Address</p>
                       <p className="font-mono text-xs text-green-100 break-all">
-                        0x742d35Cc6634C05329e38...
+                        0x8f5e9d7c4b2a1e6f8d9c5b3a7e4f2d1c
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-green-300 mb-1">Status</p>
                       <p className="font-semibold text-green-100">
-                        ✓ Active & Listed on Marketplace
+                        ✓ Active & Funds Locked
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <h4 className="font-semibold text-lg">What Just Happened?</h4>
+                  
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      ✓
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Match Found</p>
+                      <p className="text-sm text-gray-400">
+                        A counterparty committed to the opposite position (Sugar Refinery in Louisiana)
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      ✓
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Smart Contract Deployed</p>
+                      <p className="text-sm text-gray-400">
+                        The contract was deployed to the blockchain with both parties&apos; addresses locked in
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      ✓
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Deposits Secured in Escrow</p>
+                      <p className="text-sm text-gray-400">
+                        Both parties&apos; deposits are now locked in the smart contract escrow until settlement
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      ⏳
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Awaiting Settlement</p>
+                      <p className="text-sm text-gray-400">
+                        The oracle will check prices on expiry date and automatically pay out to the winning party
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-600/20 border border-blue-500 p-4 rounded-lg mb-6">
+                  <p className="text-blue-100">
+                    <strong>💡 Cost Efficiency:</strong> The smart contract was only deployed when both parties 
+                    committed, saving everyone gas costs. No unused contracts cluttering the blockchain!
+                  </p>
+                </div>
+
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => window.location.href = '/marketplace'}
+                    className="btn-primary flex-1"
+                  >
+                    View in Marketplace
+                  </button>
+                  <button 
+                    onClick={() => window.location.href = '/'}
+                    className="btn-secondary"
+                  >
+                    Back to Home
+                  </button>
+                </div>
+              </div>
+
+              <div className="card bg-slate-900/40 backdrop-blur-sm border-slate-800">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold mb-3">Ready to Protect Your Business?</h3>
+                  <p className="text-gray-300 mb-4">
+                    Join Sweet Treats Bakery and thousands of other SMEs hedging their risks with LYZN
+                  </p>
+                  <button 
+                    onClick={() => window.location.href = '/chat'}
+                    className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300"
+                  >
+                    Start Your Risk Assessment
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Complete - for new listing */}
+          {step === 'complete' && !selectedContractId && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="text-center mb-8 flex flex-col items-center">
+                <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                  <CheckCircle className="w-12 h-12" />
+                </div>
+                <h1 className="text-5xl font-bold mb-4">Listing Posted! 🎉</h1>
+                <p className="text-xl text-gray-300 max-w-md mx-auto">
+                  Your contract listing is now live on the marketplace
+                </p>
+              </div>
+
+              <div className="card border-green-500">
+                <h3 className="text-2xl font-semibold mb-4">Listing Successfully Posted</h3>
+                
+                <div className="bg-green-600/20 border border-green-500 p-6 rounded-lg mb-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-sm text-green-300 mb-1">Listing ID</p>
+                      <p className="font-mono text-xs text-green-100 break-all">
+                        LYZN-{Math.floor(Math.random() * 10000).toString().padStart(5, '0')}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-green-300 mb-1">Status</p>
+                      <p className="font-semibold text-green-100">
+                        ✓ Live on Marketplace
                       </p>
                     </div>
                   </div>
@@ -1148,9 +1306,9 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                       1
                     </div>
                     <div>
-                      <p className="font-semibold mb-1">Your Contract is Now Public</p>
+                      <p className="font-semibold mb-1">Your Listing is Now Visible</p>
                       <p className="text-sm text-gray-400">
-                        Other businesses (like sugar refineries) can discover your contract and take the opposite position
+                        Other businesses can discover your listing and review the terms
                       </p>
                     </div>
                   </div>
@@ -1160,9 +1318,9 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                       2
                     </div>
                     <div>
-                      <p className="font-semibold mb-1">Counterparty Matches</p>
+                      <p className="font-semibold mb-1">Counterparty Commits</p>
                       <p className="text-sm text-gray-400">
-                        When matched, both parties&apos; deposits are locked in escrow
+                        When someone clicks &quot;Buy&quot;, the smart contract will be generated and deployed
                       </p>
                     </div>
                   </div>
@@ -1172,9 +1330,21 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                       3
                     </div>
                     <div>
+                      <p className="font-semibold mb-1">Contract Deployed & Funded</p>
+                      <p className="text-sm text-gray-400">
+                        Both parties&apos; deposits are locked in escrow, and the contract becomes active
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      4
+                    </div>
+                    <div>
                       <p className="font-semibold mb-1">Automatic Settlement</p>
                       <p className="text-sm text-gray-400">
-                        On {new Date(contractParams.expiry).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}, the oracle reports {contractParams.commodity} prices and smart contract pays out automatically
+                        On {new Date(contractParams.expiry).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}, the oracle reports {contractParams.commodity} prices and pays out automatically
                       </p>
                     </div>
                   </div>
@@ -1182,9 +1352,8 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
 
                 <div className="bg-blue-600/20 border border-blue-500 p-4 rounded-lg mb-6">
                   <p className="text-blue-100">
-                    <strong>Protection Active:</strong> If {contractParams.commodity} prices spike and reach ${contractParams.strikePrice}/lb, 
-                    you&apos;ll receive ${parseInt(contractParams.protectionAmount).toLocaleString()} automatically - enough to cover approximately {(parseInt(contractParams.protectionAmount) / 2000).toFixed(1)} months of {contractParams.commodity} at higher prices. 
-                    Your bakery is now protected! 🛡️
+                    <strong>💡 Smart Deployment:</strong> The contract won&apos;t be deployed to the blockchain until 
+                    a counterparty commits. This saves you gas costs and ensures you only pay when there&apos;s a real match!
                   </p>
                 </div>
 

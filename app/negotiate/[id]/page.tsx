@@ -5,6 +5,8 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Send, CheckCircle, XCircle, MessageSquare, Loader2, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useContracts } from '@/contexts/ContractContext'
+import { purchaseContract } from '@/lib/purchaseHelper'
 
 type NegotiationStep = 'propose' | 'waiting' | 'received' | 'counter' | 'accepted' | 'rejected'
 
@@ -21,6 +23,239 @@ interface NegotiationOffer {
   reasoning: string
 }
 
+interface ContractConfig {
+  unit: string
+  getStrikePrice: (title: string) => string
+  getDefaultStrikePrice: (original: string) => string
+  getDefaultProtection: (original: number) => string
+  getDefaultCost: (protection: string) => string
+  getDefaultExpiry: (original: string) => string
+}
+
+// Helper function to extract strike price from title
+function extractStrikePrice(title: string): string {
+  const match = title.match(/\$([\d.]+)/)
+  return match ? match[1] : '0.55'
+}
+
+// Helper function to parse expiry date
+function parseExpiryToDate(expiry: string): string {
+  const monthMap: Record<string, string> = {
+    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+    'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+  }
+  
+  const match = expiry.match(/(\w+)\s+(\d{4})/)
+  if (match) {
+    const month = monthMap[match[1]] || '01'
+    return `${match[2]}-${month}`
+  }
+  return '2026-05'
+}
+
+// Get contract configuration based on contract ID
+function getContractConfig(contractId: string, title: string): ContractConfig {
+  if (contractId.startsWith('sugar')) {
+    return {
+      unit: '/lb',
+      getStrikePrice: (title) => extractStrikePrice(title),
+      getDefaultStrikePrice: (original) => {
+        const originalNum = parseFloat(original)
+        return (originalNum + 0.05).toFixed(2)
+      },
+      getDefaultProtection: (original) => {
+        const originalNum = parseInt(original.toString())
+        return (originalNum + 2000).toLocaleString()
+      },
+      getDefaultCost: (protection) => {
+        const protectionNum = parseInt(protection.replace(/,/g, ''))
+        return Math.round(protectionNum * 0.1).toString()
+      },
+      getDefaultExpiry: (original) => {
+        const date = parseExpiryToDate(original)
+        const [year, month] = date.split('-')
+        const nextMonth = parseInt(month) + 1
+        return nextMonth > 12 ? `${parseInt(year) + 1}-01` : `${year}-${nextMonth.toString().padStart(2, '0')}`
+      }
+    }
+  } else if (contractId.startsWith('wheat')) {
+    return {
+      unit: '/bushel',
+      getStrikePrice: (title) => extractStrikePrice(title),
+      getDefaultStrikePrice: (original) => {
+        const originalNum = parseFloat(original)
+        return (originalNum + 0.50).toFixed(2)
+      },
+      getDefaultProtection: (original) => {
+        const originalNum = parseInt(original.toString())
+        return (originalNum + 1500).toLocaleString()
+      },
+      getDefaultCost: (protection) => {
+        const protectionNum = parseInt(protection.replace(/,/g, ''))
+        return Math.round(protectionNum * 0.1).toString()
+      },
+      getDefaultExpiry: (original) => {
+        const date = parseExpiryToDate(original)
+        const [year, month] = date.split('-')
+        const nextMonth = parseInt(month) + 1
+        return nextMonth > 12 ? `${parseInt(year) + 1}-01` : `${year}-${nextMonth.toString().padStart(2, '0')}`
+      }
+    }
+  } else if (contractId.startsWith('eur')) {
+    return {
+      unit: '',
+      getStrikePrice: (title) => extractStrikePrice(title),
+      getDefaultStrikePrice: (original) => {
+        const originalNum = parseFloat(original)
+        return (originalNum + 0.02).toFixed(2)
+      },
+      getDefaultProtection: (original) => {
+        const originalNum = parseInt(original.toString())
+        return (originalNum + 500).toLocaleString()
+      },
+      getDefaultCost: (protection) => {
+        const protectionNum = parseInt(protection.replace(/,/g, ''))
+        return Math.round(protectionNum * 0.1).toString()
+      },
+      getDefaultExpiry: (original) => {
+        const date = parseExpiryToDate(original)
+        const [year, month] = date.split('-')
+        const nextMonth = parseInt(month) + 1
+        return nextMonth > 12 ? `${parseInt(year) + 1}-01` : `${year}-${nextMonth.toString().padStart(2, '0')}`
+      }
+    }
+  } else if (contractId.startsWith('oil')) {
+    return {
+      unit: '/barrel',
+      getStrikePrice: (title) => extractStrikePrice(title),
+      getDefaultStrikePrice: (original) => {
+        const originalNum = parseFloat(original)
+        return (originalNum + 5).toFixed(2)
+      },
+      getDefaultProtection: (original) => {
+        const originalNum = parseInt(original.toString())
+        return (originalNum + 500).toLocaleString()
+      },
+      getDefaultCost: (protection) => {
+        const protectionNum = parseInt(protection.replace(/,/g, ''))
+        return Math.round(protectionNum * 0.1).toString()
+      },
+      getDefaultExpiry: (original) => {
+        const date = parseExpiryToDate(original)
+        const [year, month] = date.split('-')
+        const nextMonth = parseInt(month) + 1
+        return nextMonth > 12 ? `${parseInt(year) + 1}-01` : `${year}-${nextMonth.toString().padStart(2, '0')}`
+      }
+    }
+  } else if (contractId.startsWith('coffee')) {
+    return {
+      unit: '/lb',
+      getStrikePrice: (title) => extractStrikePrice(title),
+      getDefaultStrikePrice: (original) => {
+        const originalNum = parseFloat(original)
+        return (originalNum + 0.10).toFixed(2)
+      },
+      getDefaultProtection: (original) => {
+        const originalNum = parseInt(original.toString())
+        return (originalNum + 500).toLocaleString()
+      },
+      getDefaultCost: (protection) => {
+        const protectionNum = parseInt(protection.replace(/,/g, ''))
+        return Math.round(protectionNum * 0.1).toString()
+      },
+      getDefaultExpiry: (original) => {
+        const date = parseExpiryToDate(original)
+        const [year, month] = date.split('-')
+        const nextMonth = parseInt(month) + 1
+        return nextMonth > 12 ? `${parseInt(year) + 1}-01` : `${year}-${nextMonth.toString().padStart(2, '0')}`
+      }
+    }
+  }
+  
+  // Default fallback
+  return {
+    unit: '/lb',
+    getStrikePrice: (title) => extractStrikePrice(title),
+    getDefaultStrikePrice: (original) => (parseFloat(original) + 0.05).toFixed(2),
+    getDefaultProtection: (original) => (parseInt(original.toString()) + 2000).toLocaleString(),
+    getDefaultCost: (protection) => {
+      const protectionNum = parseInt(protection.replace(/,/g, ''))
+      return Math.round(protectionNum * 0.1).toString()
+    },
+    getDefaultExpiry: (original) => {
+      const date = parseExpiryToDate(original)
+      const [year, month] = date.split('-')
+      const nextMonth = parseInt(month) + 1
+      return nextMonth > 12 ? `${parseInt(year) + 1}-01` : `${year}-${nextMonth.toString().padStart(2, '0')}`
+    }
+  }
+}
+
+// Generate conversation flow based on contract
+function generateConversationFlow(contract: any, config: ContractConfig) {
+  const originalStrike = config.getStrikePrice(contract.title)
+  const defaultStrike = config.getDefaultStrikePrice(originalStrike)
+  const defaultProtection = config.getDefaultProtection(contract.payout)
+  const defaultCost = config.getDefaultCost(defaultProtection)
+  const defaultExpiry = config.getDefaultExpiry(contract.expiry)
+  const unit = config.unit
+
+  // Customize user responses based on contract type
+  let strikeResponse = `I'd like to propose $${defaultStrike}${unit} instead. That gives me better protection against price spikes.`
+  let protectionResponse = `Yes, I'd like to increase it to $${defaultProtection} to cover more of my expenses.`
+  let expiryResponse = `Can we extend it to ${new Date(defaultExpiry).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}? I need a longer protection window.`
+
+  if (contract.id.startsWith('wheat')) {
+    strikeResponse = `I'd like to propose $${defaultStrike}${unit} instead. That provides better coverage for my flour costs.`
+    protectionResponse = `Yes, I'd like to increase it to $${defaultProtection} to better protect my bakery operations.`
+  } else if (contract.id.startsWith('eur')) {
+    strikeResponse = `I'd like to propose ${defaultStrike} instead. That gives me better protection against currency fluctuations.`
+    protectionResponse = `Yes, I'd like to increase it to $${defaultProtection} to cover more of my international transactions.`
+  } else if (contract.id.startsWith('oil')) {
+    strikeResponse = `I'd like to propose $${defaultStrike}${unit} instead. That provides better protection for my fuel costs.`
+    protectionResponse = `Yes, I'd like to increase it to $${defaultProtection} to better cover my transportation expenses.`
+  } else if (contract.id.startsWith('coffee')) {
+    strikeResponse = `I'd like to propose $${defaultStrike}${unit} instead. That gives me better protection against coffee price volatility.`
+    protectionResponse = `Yes, I'd like to increase it to $${defaultProtection} to cover more of my coffee purchasing needs.`
+  }
+
+  return [
+    {
+      assistant: `I'll help you negotiate better terms with ${contract.counterparty}. Let's start with the strike price. The current contract offers $${originalStrike}${unit}. What strike price would work better for your business?`,
+      user: strikeResponse,
+      delay: 2000,
+      action: (setOffer: any) => {
+        setOffer((prev: NegotiationOffer) => ({ ...prev, strikePrice: defaultStrike }))
+      }
+    },
+    {
+      assistant: `Good choice at $${defaultStrike}${unit}. Now, what about the protection amount? The original contract offers $${contract.payout.toLocaleString()}. Would you like to adjust this?`,
+      user: protectionResponse,
+      delay: 2500,
+      action: (setOffer: any) => {
+        setOffer((prev: NegotiationOffer) => ({ ...prev, protectionAmount: defaultProtection.replace(/,/g, ''), cost: defaultCost }))
+      }
+    },
+    {
+      assistant: `That means your cost would be around $${defaultCost} (10% deposit). The original expiry is ${contract.expiry}. Would you like to adjust the timeline?`,
+      user: expiryResponse,
+      delay: 2000,
+      action: (setOffer: any) => {
+        setOffer((prev: NegotiationOffer) => ({ ...prev, expiry: defaultExpiry }))
+      }
+    },
+    {
+      assistant: `Perfect! I'll send your proposal to ${contract.counterparty}: $${defaultStrike}${unit} strike price, $${defaultProtection} protection, $${defaultCost} cost, expiring ${new Date(defaultExpiry).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}. Let me submit this...`,
+      user: null,
+      delay: 1500,
+      action: (setShowButtons: any) => {
+        setShowButtons(true)
+      }
+    }
+  ]
+}
+
 function NegotiationChatFlow({ 
   contract,
   onComplete 
@@ -33,48 +268,25 @@ function NegotiationChatFlow({
   const [messages, setMessages] = useState<Message[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [showButtons, setShowButtons] = useState(false)
+  
+  const config = getContractConfig(contract.id, contract.title)
+  const originalStrike = config.getStrikePrice(contract.title)
+  const defaultStrike = config.getDefaultStrikePrice(originalStrike)
+  const defaultProtection = config.getDefaultProtection(contract.payout)
+  const defaultCost = config.getDefaultCost(defaultProtection)
+  const defaultExpiry = config.getDefaultExpiry(contract.expiry)
+
   const [negotiatedOffer, setNegotiatedOffer] = useState<NegotiationOffer>({
-    strikePrice: '0.60',
-    protectionAmount: '6000',
-    cost: '600',
-    expiry: '2026-06',
+    strikePrice: defaultStrike,
+    protectionAmount: defaultProtection.replace(/,/g, ''),
+    cost: defaultCost,
+    expiry: defaultExpiry,
     reasoning: ''
   })
 
-  const conversationFlow = useMemo(() => [
-    {
-      assistant: `I'll help you negotiate better terms with ${contract.counterparty}. Let's start with the strike price. The current contract offers $${contract.originalStrikePrice}/lb. What strike price would work better for your business?`,
-      user: "I'd like to propose $0.60/lb instead. That gives me better protection against price spikes.",
-      delay: 2000,
-      action: () => {
-        setNegotiatedOffer(prev => ({ ...prev, strikePrice: '0.60' }))
-      }
-    },
-    {
-      assistant: `Good choice at $0.60/lb. Now, what about the protection amount? The original contract offers $${contract.originalPayout}. Would you like to adjust this?`,
-      user: "Yes, I'd like to increase it to $6,000 to cover more of my expenses.",
-      delay: 2500,
-      action: () => {
-        setNegotiatedOffer(prev => ({ ...prev, protectionAmount: '6000', cost: '600' }))
-      }
-    },
-    {
-      assistant: "That means your cost would be around $600 (10% deposit). The original expiry is " + contract.expiry + ". Would you like to adjust the timeline?",
-      user: "Can we extend it to June 2026? I need a longer protection window.",
-      delay: 2000,
-      action: () => {
-        setNegotiatedOffer(prev => ({ ...prev, expiry: '2026-06' }))
-      }
-    },
-    {
-      assistant: `Perfect! I'll send your proposal to ${contract.counterparty}: $0.60/lb strike price, $6,000 protection, $600 cost, expiring June 2026. Let me submit this...`,
-      user: null,
-      delay: 1500,
-      action: () => {
-        setShowButtons(true)
-      }
-    }
-  ], [contract.counterparty, contract.originalStrikePrice, contract.originalPayout, contract.expiry])
+  const conversationFlow = useMemo(() => {
+    return generateConversationFlow(contract, config)
+  }, [contract, config])
 
   useEffect(() => {
     if (hasStartedRef.current) return
@@ -97,7 +309,10 @@ function NegotiationChatFlow({
         }
         
         if (step.action) {
-          step.action()
+          step.action(setNegotiatedOffer)
+          if (i === conversationFlow.length - 1) {
+            step.action(setShowButtons)
+          }
         }
       }
     }
@@ -126,6 +341,11 @@ function NegotiationChatFlow({
       // Simulate counterparty decision after 4 seconds
       setTimeout(() => {
         const response = Math.random()
+        const unit = config.unit
+        const counterStrike = (parseFloat(defaultStrike) - 0.02).toFixed(2)
+        const counterProtection = (parseInt(defaultProtection.replace(/,/g, '')) - 500).toString()
+        const counterCost = Math.round(parseInt(counterProtection) * 0.1).toString()
+        
         if (response < 0.33) {
           setMessages(prev => [...prev, { 
             role: 'assistant', 
@@ -140,21 +360,24 @@ function NegotiationChatFlow({
           setTimeout(() => onComplete(negotiatedOffer, 'rejected'), 2000)
         } else {
           const counterOffer: NegotiationOffer = {
-            strikePrice: '0.57',
-            protectionAmount: '5500',
-            cost: '550',
-            expiry: '2026-05',
+            strikePrice: counterStrike,
+            protectionAmount: counterProtection,
+            cost: counterCost,
+            expiry: defaultExpiry,
             reasoning: 'We can agree to these terms with a slightly adjusted strike price and amount.'
           }
           setMessages(prev => [...prev, { 
             role: 'assistant', 
-            content: `${contract.counterparty} sent a counter-offer: $0.57/lb strike, $5,500 protection, $550 cost, May 2026 expiry. They said: "${counterOffer.reasoning}"` 
+            content: `${contract.counterparty} sent a counter-offer: $${counterStrike}${unit} strike, $${parseInt(counterProtection).toLocaleString()} protection, $${counterCost} cost, ${new Date(defaultExpiry).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} expiry. They said: "${counterOffer.reasoning}"` 
           }])
           setTimeout(() => onComplete(negotiatedOffer, 'counter', counterOffer), 2000)
         }
       }, 4000)
     }, 1000)
   }
+
+  const unit = config.unit
+  const displayUnit = contract.id.startsWith('eur') ? '' : unit
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -198,7 +421,7 @@ function NegotiationChatFlow({
             <strong>Your Proposal:</strong>
           </p>
           <div className="text-sm text-blue-100 space-y-2 mb-6">
-            <p>• Strike Price: ${negotiatedOffer.strikePrice}/lb</p>
+            <p>• Strike Price: ${negotiatedOffer.strikePrice}{displayUnit}</p>
             <p>• Protection Amount: ${parseInt(negotiatedOffer.protectionAmount).toLocaleString()}</p>
             <p>• Your Cost: ${negotiatedOffer.cost}</p>
             <p>• Expiry: {new Date(negotiatedOffer.expiry).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
@@ -218,22 +441,36 @@ function NegotiationChatFlow({
 
 export default function NegotiatePage({ params }: { params: { id: string } }) {
   const router = useRouter()
+  const { contracts } = useContracts()
   const [step, setStep] = useState<NegotiationStep>('propose')
   const [offer, setOffer] = useState<NegotiationOffer | null>(null)
   const [counterOffer, setCounterOffer] = useState<NegotiationOffer | null>(null)
   
-  // Mock contract data
-  const contract = {
-    id: params.id,
-    title: 'Will sugar exceed $0.55/lb by May 2026?',
-    category: 'Commodities',
-    counterparty: 'Sugar Refinery',
-    location: 'Louisiana',
-    originalStrikePrice: '0.55',
-    originalCost: '450',
-    originalPayout: '1000',
-    expiry: 'May 2026'
+  // Find the contract from context
+  const contract = contracts.find(c => c.id === params.id)
+  
+  if (!contract) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="pt-24 pb-12 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="card text-center">
+              <h1 className="text-2xl font-bold mb-4">Contract Not Found</h1>
+              <p className="text-gray-400 mb-6">The contract you&apos;re looking for doesn&apos;t exist.</p>
+              <Link href="/marketplace" className="btn-primary">
+                Back to Marketplace
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  const config = getContractConfig(contract.id, contract.title)
+  const unit = config.unit
+  const displayUnit = contract.id.startsWith('eur') ? '' : unit
 
   const handleNegotiationComplete = (
     negotiatedOffer: NegotiationOffer, 
@@ -249,6 +486,10 @@ export default function NegotiatePage({ params }: { params: { id: string } }) {
 
   const handleCounterResponse = (action: 'accept' | 'reject') => {
     if (action === 'accept') {
+      // Update offer to use counter-offer values when accepting
+      if (counterOffer) {
+        setOffer(counterOffer)
+      }
       setStep('accepted')
     } else {
       setStep('rejected')
@@ -284,7 +525,7 @@ export default function NegotiatePage({ params }: { params: { id: string } }) {
           )}
 
           {/* Received Counter-Offer */}
-          {step === 'received' && counterOffer && (
+          {step === 'counter' && counterOffer && (
             <div className="space-y-6 animate-fade-in">
               <div className="card border-yellow-500">
                 <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
@@ -300,7 +541,7 @@ export default function NegotiatePage({ params }: { params: { id: string } }) {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-400">Strike Price</p>
-                      <p className="text-xl font-semibold">${counterOffer.strikePrice}/lb</p>
+                      <p className="text-xl font-semibold">${counterOffer.strikePrice}{displayUnit}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-400">Protection Amount</p>
@@ -360,7 +601,7 @@ export default function NegotiatePage({ params }: { params: { id: string } }) {
                 <div className="grid md:grid-cols-2 gap-4 text-left">
                   <div>
                     <p className="text-sm text-gray-400">Strike Price</p>
-                    <p className="text-xl font-semibold">${offer.strikePrice}/lb</p>
+                    <p className="text-xl font-semibold">${offer.strikePrice}{displayUnit}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Protection Amount</p>
@@ -385,10 +626,29 @@ export default function NegotiatePage({ params }: { params: { id: string } }) {
                   Back to Marketplace
                 </button>
                 <button
-                  onClick={() => router.push(`/contract/${params.id}`)}
+                  onClick={() => {
+                    // Calculate cost from the negotiated offer
+                    const cost = offer ? parseInt(offer.cost) : contract.cost
+                    const payout = offer ? parseInt(offer.protectionAmount) : contract.payout
+                    const expiry = offer ? new Date(offer.expiry).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : contract.expiry
+                    
+                    // Save purchase
+                    purchaseContract({
+                      id: contract.id,
+                      title: contract.title,
+                      position: contract.position,
+                      cost: cost,
+                      payout: payout,
+                      expiry: expiry,
+                      counterparty: contract.counterparty
+                    })
+                    
+                    alert('✅ Smart contract deployed! Position added to your dashboard.')
+                    setTimeout(() => router.push('/dashboard'), 1500)
+                  }}
                   className="btn-primary"
                 >
-                  Proceed to Purchase
+                  Execute Contract
                 </button>
               </div>
             </div>
@@ -426,4 +686,3 @@ export default function NegotiatePage({ params }: { params: { id: string } }) {
     </div>
   )
 }
-

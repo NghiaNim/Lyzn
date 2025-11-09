@@ -5,8 +5,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Search, Filter, TrendingUp } from 'lucide-react'
 import { useContracts } from '@/contexts/ContractContext'
+import { purchaseContract } from '@/lib/purchaseHelper'
+import { useRouter } from 'next/navigation'
 
 export default function MarketplacePage() {
+  const router = useRouter()
   const { contracts: allContracts } = useContracts()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -167,12 +170,26 @@ export default function MarketplacePage() {
                     </div>
 
                     <div className="flex gap-3">
-                      <Link 
-                        href={`/contract/${contract.id}`}
+                      <button 
+                        onClick={() => {
+                          // Save purchase to localStorage
+                          purchaseContract({
+                            id: contract.id,
+                            title: contract.title,
+                            position: contract.position,
+                            cost: contract.cost,
+                            payout: contract.payout,
+                            expiry: contract.expiry,
+                            counterparty: contract.counterparty
+                          })
+                          
+                          alert('✅ Smart contract deployed! Position added to your dashboard.')
+                          setTimeout(() => router.push('/dashboard'), 1500)
+                        }}
                         className="btn-primary"
                       >
-                        View Details
-                      </Link>
+                        Buy Now
+                      </button>
                       <Link
                         href={`/negotiate/${contract.id}`}
                         className="btn-secondary"
