@@ -6,10 +6,37 @@ import { Coffee, Wheat, Fuel, DollarSign, TrendingUp, Building } from 'lucide-re
 
 export default function SolutionsPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-950">
       <Navigation />
       
-      <div className="pt-32 pb-20 px-6">
+      {/* Background Image with Overlay */}
+      <div className="fixed inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/building-bg.jpg)'
+          }}
+        />
+        <div className="absolute inset-0 bg-slate-950/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/40"></div>
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+      </div>
+
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-1/4 -right-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="relative pt-32 pb-20 px-6 z-10">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-5xl font-bold mb-6 text-center">Solutions by Industry</h1>
           <p className="text-xl text-gray-300 text-center mb-16">
@@ -18,7 +45,7 @@ export default function SolutionsPage() {
 
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {/* Food & Beverage */}
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <div className="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center mb-4">
                 <Coffee className="w-6 h-6" />
               </div>
@@ -46,7 +73,7 @@ export default function SolutionsPage() {
             </div>
 
             {/* Agriculture */}
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
                 <Wheat className="w-6 h-6" />
               </div>
@@ -74,7 +101,7 @@ export default function SolutionsPage() {
             </div>
 
             {/* Transportation */}
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4">
                 <Fuel className="w-6 h-6" />
               </div>
@@ -102,7 +129,7 @@ export default function SolutionsPage() {
             </div>
 
             {/* Import/Export */}
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
                 <DollarSign className="w-6 h-6" />
               </div>
@@ -130,7 +157,7 @@ export default function SolutionsPage() {
             </div>
 
             {/* Manufacturing */}
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
                 <Building className="w-6 h-6" />
               </div>
@@ -158,7 +185,7 @@ export default function SolutionsPage() {
             </div>
 
             {/* Construction */}
-            <div className="card">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
               <div className="w-12 h-12 bg-yellow-600 rounded-lg flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6" />
               </div>
@@ -187,12 +214,12 @@ export default function SolutionsPage() {
           </div>
 
           {/* CTA */}
-          <div className="card bg-gradient-to-r from-blue-600 to-blue-800 text-center">
+          <div className="card bg-slate-900/40 backdrop-blur-sm border-slate-800 text-center">
             <h2 className="text-3xl font-bold mb-4">Don&apos;t See Your Industry?</h2>
-            <p className="text-xl text-blue-100 mb-6">
+            <p className="text-xl text-gray-300 mb-6">
               Our AI can identify and hedge risks for any business type
             </p>
-            <Link href="/chat" className="btn-secondary bg-white text-blue-600 hover:bg-gray-100 inline-block">
+            <Link href="/chat" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300 inline-block">
               Chat with AI to Explore Your Options
             </Link>
           </div>
