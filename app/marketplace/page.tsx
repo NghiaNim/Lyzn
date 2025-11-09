@@ -22,20 +22,23 @@ interface Contract {
 
 // Convert backend orders to frontend contracts format
 function orderToContract(order: any): Contract {
-  const underlying = order.underlying.toUpperCase()
+  const underlying = order.underlying.toLowerCase()
   const direction = order.direction
   const strikePrice = ((order.strikeMin + order.strikeMax) / 2).toFixed(2)
   const expiryDate = new Date(order.expiry).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
   
   const categories: Record<string, string> = {
-    'BTC': 'Crypto',
-    'ETH': 'Crypto',
-    'SOL': 'Crypto',
-    'SUGAR': 'Commodities',
-    'WHEAT': 'Commodities',
-    'COFFEE': 'Commodities',
-    'OIL': 'Energy',
-    'EUR': 'Currency',
+    'sugar': 'Commodities',
+    'wheat': 'Commodities',
+    'coffee': 'Commodities',
+    'corn': 'Commodities',
+    'soybeans': 'Commodities',
+    'cotton': 'Commodities',
+    'oil': 'Energy',
+    'eur': 'Currency',
+    'btc': 'Crypto',
+    'eth': 'Crypto',
+    'sol': 'Crypto',
   }
 
   return {

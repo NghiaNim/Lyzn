@@ -1,7 +1,9 @@
 'use client'
 
 import Navigation from '@/components/Navigation'
-import { TrendingUp, TrendingDown, Clock, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { TrendingUp, TrendingDown, Clock, CheckCircle, Loader2 } from 'lucide-react'
 
 interface Position {
   id: string
@@ -16,44 +18,55 @@ interface Position {
   result?: 'won' | 'lost'
 }
 
-const positions: Position[] = [
-  {
-    id: '1',
-    title: 'Will sugar exceed $0.55/lb by May 2026?',
-    position: 'YES',
+function orderToPosition(order: any): Position {
+  const underlying = order.underlying.toLowerCase()
+  const direction = order.direction
+  const strikePrice = ((order.strikeMin + order.strikeMax) / 2).toFixed(2)
+  const expiryDate = new Date(order.expiry).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    year: 'numeric' 
+  })
+  
+  const invested = Math.round(order.notional * 0.1)
+  
+  return {
+    id: order.id,
+    title: `Will ${underlying} exceed $${strikePrice} by ${expiryDate}?`,
+    position: direction === 'LONG' ? 'YES' : 'NO',
     quantity: 1,
-    invested: 454,
-    currentValue: 485,
-    payout: 1000,
-    expiry: 'May 31, 2026',
+    invested,
+    currentValue: Math.round(invested * 1.07), // Mock 7% unrealized gain
+    payout: order.notional,
+    expiry: expiryDate,
     status: 'active'
-  },
-  {
-    id: '2',
-    title: 'Will wheat exceed $8/bushel by Jun 2026?',
-    position: 'YES',
-    quantity: 2,
-    invested: 1050,
-    currentValue: 1120,
-    payout: 2000,
-    expiry: 'Jun 30, 2026',
-    status: 'active'
-  },
-  {
-    id: '3',
-    title: 'Will coffee exceed $2.30/lb by Dec 2025?',
-    position: 'YES',
-    quantity: 1,
-    invested: 380,
-    currentValue: 0,
-    payout: 0,
-    expiry: 'Dec 31, 2025',
-    status: 'settled',
-    result: 'lost'
   }
-]
+}
 
 export default function DashboardPage() {
+  const [positions, setPositions] = useState<Position[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadPositions()
+  }, [])
+
+  async function loadPositions() {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/orders?status=OPEN')
+      if (response.ok) {
+        const data = await response.json()
+        const loadedPositions = data.orders.map(orderToPosition)
+        setPositions(loadedPositions)
+      }
+    } catch (error) {
+      console.error('Failed to load positions:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const activePositions = positions.filter(p => p.status === 'active')
   const totalInvested = activePositions.reduce((sum, p) => sum + p.invested, 0)
   const totalCurrentValue = activePositions.reduce((sum, p) => sum + p.currentValue, 0)
@@ -96,11 +109,28 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="card text-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-400" />
+              <p className="text-gray-400">Loading positions...</p>
+            </div>
+          )}
+
           {/* Active Positions */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Active Positions</h2>
-            <div className="space-y-4">
-              {activePositions.map((position) => (
+          {!loading && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">Active Positions</h2>
+              {activePositions.length === 0 ? (
+                <div className="card text-center py-12">
+                  <p className="text-gray-400 mb-4">No active positions yet</p>
+                  <Link href="/marketplace" className="btn-primary inline-block">
+                    Browse Marketplace
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {activePositions.map((position) => (
                 <div key={position.id} className="card hover:border-blue-500 transition-colors">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -152,20 +182,26 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="flex gap-3 mt-4">
-                    <button className="btn-secondary text-sm">
+                    <Link 
+                      href={`/contract/${position.id}`}
+                      className="btn-secondary text-sm"
+                    >
                       View Details
-                    </button>
+                    </Link>
                     <button className="btn-secondary text-sm">
                       Sell Position
                     </button>
                   </div>
                 </div>
-              ))}
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Settlement History */}
-          <div>
+          {!loading && (
+            <div>
             <h2 className="text-2xl font-bold mb-4">Settlement History</h2>
             <div className="space-y-4">
               {positions.filter(p => p.status === 'settled').map((position) => (
@@ -197,7 +233,8 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

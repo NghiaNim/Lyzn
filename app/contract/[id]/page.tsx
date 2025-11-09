@@ -1,38 +1,38 @@
 'use client'
 
 import Navigation from '@/components/Navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { TrendingUp, Calendar, DollarSign, Shield, CheckCircle } from 'lucide-react'
-import { useContracts } from '@/contexts/ContractContext'
+import { TrendingUp, Calendar, DollarSign, Shield, CheckCircle, Loader2 } from 'lucide-react'
 
 export default function ContractDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const { contracts, purchaseContract } = useContracts()
   const [quantity, setQuantity] = useState(1)
   const [step, setStep] = useState<'details' | 'deposit' | 'confirmed'>('details')
+  const [contractData, setContractData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Find the contract from the context
-  const contractFromContext = contracts.find(c => c.id === params.id)
-  
-  // Mock contract data - merge with context data if available
-  const contract = contractFromContext ? {
-    id: contractFromContext.id,
-    title: contractFromContext.title,
-    category: contractFromContext.category,
-    counterparty: contractFromContext.counterparty,
-    location: contractFromContext.location,
-    position: contractFromContext.position,
-    contracts: contractFromContext.contracts,
-    avgPrice: contractFromContext.avgPrice,
-    cost: contractFromContext.cost,
-    payout: contractFromContext.payout,
-    expiry: contractFromContext.expiry === 'May 2026' ? 'May 31, 2026' : contractFromContext.expiry,
-    oracle: 'USDA Agricultural Prices API',
-    currentPrice: 0.48,
-    strikePrice: 0.55,
-    description: `This contract protects against ${contractFromContext.category.toLowerCase()} price increases. If the condition is met, ${contractFromContext.position} holders receive $${contractFromContext.payout.toLocaleString()} per contract.`,
-  } : {
+  useEffect(() => {
+    fetchContract()
+  }, [params.id])
+
+  async function fetchContract() {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/contracts/${params.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setContractData(data.contract)
+      }
+    } catch (error) {
+      console.error('Failed to fetch contract:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Use contract data from API or fallback to mock
+  const contract = contractData || {
     id: params.id,
     title: 'Will sugar exceed $0.55/lb by May 2026?',
     category: 'Commodities',
@@ -57,10 +57,24 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
   const handleConfirmDeposit = () => {
     // Simulate blockchain transaction
     setTimeout(() => {
-      // Update the contract list by removing the purchased quantity
-      purchaseContract(params.id, quantity)
       setStep('confirmed')
     }, 2000)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="pt-24 pb-12 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="card text-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-400" />
+              <p className="text-gray-400">Loading contract details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

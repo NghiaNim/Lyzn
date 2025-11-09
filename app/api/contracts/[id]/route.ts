@@ -1,77 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const supabase = getSupabaseServer();
 
-    const userId = (session.user as any).id;
+    // Fetch contract from Supabase
+    const { data: contract, error } = await supabase
+      .from('contracts')
+      .select('*')
+      .eq('id', params.id)
+      .single();
 
-    const contract = await prisma.contract.findUnique({
-      where: { id: params.id },
-      include: {
-        match: {
-          include: {
-            orderA: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    wallet: true,
-                  },
-                },
-              },
-            },
-            orderB: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    wallet: true,
-                  },
-                },
-              },
-            },
-            negotiations: {
-              orderBy: { createdAt: 'desc' },
-              include: {
-                signatures: true,
-              },
-            },
-          },
-        },
-        transactions: {
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-    });
-
-    if (!contract) {
+    if (error || !contract) {
+      console.error('Contract not found:', error);
       return NextResponse.json({ error: 'Contract not found' }, { status: 404 });
     }
 
-    // Verify user is a party to the contract (via match)
-    const isParty =
-      contract.match.orderA.userId === userId ||
-      contract.match.orderB.userId === userId;
+    // Transform to expected format for frontend
+    const strikePrice = ((contract.strike_min + contract.strike_max) / 2).toFixed(2);
+    const expiryDate = new Date(contract.expiry).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric' 
+    });
 
-    if (!isParty) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const categories: Record<string, string> = {
+      'sugar': 'Commodities',
+      'wheat': 'Commodities',
+      'coffee': 'Commodities',
+      'corn': 'Commodities',
+      'soybeans': 'Commodities',
+      'cotton': 'Commodities',
+      'oil': 'Energy',
+      'eur': 'Currency',
+      'btc': 'Crypto',
+      'eth': 'Crypto',
+      'sol': 'Crypto',
+    };
 
-    return NextResponse.json({ contract });
+    const transformed = {
+      id: contract.id,
+      title: `Will ${contract.underlying.toLowerCase()} exceed $${strikePrice} by ${expiryDate}?`,
+      category: categories[contract.underlying] || 'Commodities',
+      counterparty: contract.party_a?.slice(0, 8) || 'Unknown',
+      location: 'Online',
+      position: contract.direction === 'LONG' ? 'YES' : 'NO',
+      contracts: 100,
+      avgPrice: 0.45,
+      cost: Math.round(contract.notional * 0.1),
+      payout: contract.notional,
+      expiry: expiryDate,
+      oracle: 'Pyth Network',
+      currentPrice: parseFloat(strikePrice) * 0.95,
+      strikePrice: parseFloat(strikePrice),
+      description: `This contract protects against ${contract.underlying} price ${contract.direction === 'LONG' ? 'increases' : 'decreases'}. If ${contract.underlying} ${contract.direction === 'LONG' ? 'exceeds' : 'falls below'} $${strikePrice} by ${expiryDate}, ${contract.direction === 'LONG' ? 'YES' : 'NO'} holders receive $${contract.notional.toLocaleString()} per contract.`,
+    };
+
+    return NextResponse.json({ contract: transformed });
   } catch (error) {
     console.error('Error fetching contract:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: String(error) },
       { status: 500 }
     );
   }

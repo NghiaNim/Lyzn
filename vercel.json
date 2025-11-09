@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/settle-expired",
+      "schedule": "*/5 * * * *"
+    }
+  ],
+  "env": {
+    "CRON_SECRET": "@cron-secret"
+  }
+}
+

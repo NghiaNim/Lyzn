@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { createAuditLog } from '@/lib/audit';
 import { checkIdempotency, storeIdempotency } from '@/lib/idempotency';
 import { checkNotionalLimit } from '@/lib/notional-limits';
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 const CreateOrderSchema = z.object({
   underlying: z.string(),
@@ -55,21 +56,41 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const orders = await prisma.order.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            id: true,
-            wallet: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    // Fetch from Supabase instead of Prisma
+    const supabase = getSupabaseServer();
 
-    return NextResponse.json({ orders });
+    const { data: contracts, error } = await supabase
+      .from('contracts')
+      .select('*')
+      .eq('status', 'OPEN')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json({ orders: [] });
+    }
+
+    // Transform contracts to orders format
+    const orders = (contracts || []).map((contract: any) => ({
+      id: contract.id,
+      userId: contract.party_a || 'unknown',
+      underlying: contract.underlying,
+      direction: contract.direction,
+      strikeMin: contract.strike_min || contract.strike - 1000,
+      strikeMax: contract.strike_max || contract.strike + 1000,
+      notional: contract.notional,
+      expiry: contract.expiry,
+      tolDays: 7,
+      status: contract.status,
+      createdAt: contract.created_at,
+      user: {
+        id: contract.party_a || 'unknown',
+        wallet: contract.party_a || 'Unknown',
+      },
+    }));
+
+    return NextResponse.json({ orders, source: 'Supabase' });
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json(
