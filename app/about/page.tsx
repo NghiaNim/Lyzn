@@ -26,7 +26,7 @@ export default function AboutPage() {
                   <p className="text-gray-300 leading-relaxed">
                     33.2 million US small businesses (99.9% of all businesses) face trillions in unhedged risk. 
                     The $600 trillion derivatives market is built for institutions, not them. LYZN exists to change that.
-                    We're building a peer-to-peer marketplace where businesses can protect themselves from price 
+                    We&apos;re building a peer-to-peer marketplace where businesses can protect themselves from price 
                     volatility—just like Fortune 500 companies do.
                   </p>
                 </div>
@@ -39,7 +39,7 @@ export default function AboutPage() {
                   <Lightbulb className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold mb-3">How We're Different</h2>
+                  <h2 className="text-2xl font-bold mb-3">How We&apos;re Different</h2>
                   <p className="text-gray-300 leading-relaxed mb-4">
                     Traditional derivatives require $100K+ minimums, complex financial expertise, and expensive 
                     legal agreements. LYZN uses AI to match businesses with natural counterparties and automates 
@@ -108,7 +108,7 @@ export default function AboutPage() {
                 <div className="flex gap-3">
                   <span className="font-bold">1.</span>
                   <div>
-                    <strong>LLMs</strong> - Can translate "my sugar costs are killing me" into structured financial contracts
+                    <strong>LLMs</strong> - Can translate &ldquo;my sugar costs are killing me&rdquo; into structured financial contracts
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -120,7 +120,7 @@ export default function AboutPage() {
                 <div className="flex gap-3">
                   <span className="font-bold">3.</span>
                   <div>
-                    <strong>Regulatory Clarity</strong> - Kalshi's 2024 court victory legitimized event contracts
+                    <strong>Regulatory Clarity</strong> - Kalshi&apos;s 2024 court victory legitimized event contracts
                   </div>
                 </div>
               </div>

@@ -84,7 +84,7 @@ export default function ChatPage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">AI Risk Assessment</h1>
-            <p className="text-gray-400">Let's understand your business risks together</p>
+            <p className="text-gray-400">Let&apos;s understand your business risks together</p>
           </div>
 
           {/* Chat Container */}

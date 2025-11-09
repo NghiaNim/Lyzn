@@ -351,7 +351,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                         3
                       </div>
                       <p className="text-gray-300">
-                        If sugar exceeds ${contract.strikePrice}/lb, you'll receive ${contract.payout * quantity} automatically.
+                        If sugar exceeds ${contract.strikePrice}/lb, you&apos;ll receive ${contract.payout * quantity} automatically.
                       </p>
                     </div>
                   </div>

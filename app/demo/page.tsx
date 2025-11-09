@@ -637,7 +637,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                     <div>
                       <p className="font-semibold mb-1">Counterparty Matches</p>
                       <p className="text-sm text-gray-400">
-                        When matched, both parties' deposits are locked in escrow
+                        When matched, both parties&apos; deposits are locked in escrow
                       </p>
                     </div>
                   </div>
@@ -658,7 +658,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                 <div className="bg-blue-600/20 border border-blue-500 p-4 rounded-lg mb-6">
                   <p className="text-blue-100">
                     <strong>Protection Active:</strong> If {contractParams.commodity} prices spike and reach ${contractParams.strikePrice}/lb, 
-                    you'll receive ${parseInt(contractParams.protectionAmount).toLocaleString()} automatically - enough to cover approximately {(parseInt(contractParams.protectionAmount) / 2000).toFixed(1)} months of {contractParams.commodity} at higher prices. 
+                    you&apos;ll receive ${parseInt(contractParams.protectionAmount).toLocaleString()} automatically - enough to cover approximately {(parseInt(contractParams.protectionAmount) / 2000).toFixed(1)} months of {contractParams.commodity} at higher prices. 
                     Your bakery is now protected! 🛡️
                   </p>
                 </div>

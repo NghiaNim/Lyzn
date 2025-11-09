@@ -180,7 +180,7 @@ export default function Home() {
             </h1>
             
             <p className="hero-subtitle text-xl text-gray-300 mb-4 font-normal leading-relaxed max-w-3xl mx-auto tracking-wide border-l-2 border-blue-400 pl-6 italic">
-              "Risk Management Infrastructure for SMEs via Event Contracts"
+              &ldquo;Risk Management Infrastructure for SMEs via Event Contracts&rdquo;
             </p>
 
             <p className="hero-subtitle text-xl text-gray-400 mb-16 font-light leading-relaxed max-w-3xl mx-auto">
