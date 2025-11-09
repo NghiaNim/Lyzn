@@ -20,53 +20,57 @@ export default function ChatPage() {
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [step, setStep] = useState(0)
 
-  const conversationFlow = [
-    {
-      trigger: () => true,
-      response: "Great! I'd love to understand your business better. What are your main ingredients, supplies, or operating costs?"
-    },
-    {
-      trigger: (msg: string) => msg.length > 10,
-      response: "Got it. How much do you typically spend on these each month? And which costs worry you the most?"
-    },
-    {
-      trigger: (msg: string) => msg.length > 10,
-      response: "I understand—price volatility can really impact your business. Let me analyze your risk profile...",
-      action: () => {
+  const handleSend = async () => {
+    if (!input.trim() || isTyping) return
+
+    const userMessage: Message = { role: 'user', content: input }
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
+    setInput('')
+    setIsTyping(true)
+
+    try {
+      // Call Grok API through our backend
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: newMessages,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get response')
+      }
+
+      const data = await response.json()
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: data.message,
+      }
+      
+      setMessages(prev => [...prev, assistantMessage])
+      
+      // Check if we should redirect to risks page
+      if (data.analysis?.suggestRisks && newMessages.length >= 3) {
         setTimeout(() => {
           router.push('/risks')
         }, 2000)
       }
-    }
-  ]
-
-  const handleSend = async () => {
-    if (!input.trim()) return
-
-    const userMessage: Message = { role: 'user', content: input }
-    setMessages(prev => [...prev, userMessage])
-    setInput('')
-    setIsTyping(true)
-
-    // Simulate AI typing delay
-    setTimeout(() => {
-      if (step < conversationFlow.length) {
-        const flow = conversationFlow[step]
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: flow.response
-        }
-        setMessages(prev => [...prev, assistantMessage])
-        setIsTyping(false)
-        setStep(step + 1)
-        
-        if (flow.action) {
-          flow.action()
-        }
+    } catch (error) {
+      console.error('Error sending message:', error)
+      // Fallback message
+      const fallbackMessage: Message = {
+        role: 'assistant',
+        content: "I'm having trouble connecting right now. Could you tell me more about your business and what costs worry you most?"
       }
-    }, 1000)
+      setMessages(prev => [...prev, fallbackMessage])
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -108,7 +112,7 @@ export default function ChatPage() {
                         <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
                           AI
                         </div>
-                        <span className="text-xs text-gray-400">LYZN Assistant</span>
+                        <span className="text-xs text-gray-400">LYZN Assistant (Powered by ChatGPT)</span>
                       </div>
                     )}
                     <p className="whitespace-pre-wrap">{message.content}</p>
@@ -121,7 +125,7 @@ export default function ChatPage() {
                   <div className="bg-slate-700 rounded-lg px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-gray-400">AI is typing...</span>
+                      <span className="text-gray-400">AI is thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -161,18 +165,21 @@ export default function ChatPage() {
               <button
                 onClick={() => setInput("I run a bakery in Brooklyn")}
                 className="text-sm px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+                disabled={isTyping}
               >
                 I run a bakery in Brooklyn
               </button>
               <button
                 onClick={() => setInput("We use a lot of sugar, wheat flour, and butter. Also diesel for delivery.")}
                 className="text-sm px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+                disabled={isTyping}
               >
                 Our main costs are sugar, flour, and fuel
               </button>
               <button
                 onClick={() => setInput("Sugar costs about $2,000/month. Last year prices spiked 40% and we almost went under.")}
                 className="text-sm px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+                disabled={isTyping}
               >
                 Sugar price spikes are killing us
               </button>
@@ -183,4 +190,3 @@ export default function ChatPage() {
     </div>
   )
 }
-

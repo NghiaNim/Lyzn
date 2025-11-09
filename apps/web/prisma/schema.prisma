@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -73,7 +74,7 @@ model Negotiation {
   strike      Decimal  @db.Decimal(20, 8)
   notional    Decimal  @db.Decimal(20, 8)
   expiry      DateTime
-  termsHash   String   @index
+  termsHash   String
   message     String?
   createdAt   DateTime @default(now())
 
@@ -81,12 +82,14 @@ model Negotiation {
 }
 
 model NegotiationSignature {
-  id          String      @id @default(cuid())
-  termsHash   String      @index
-  userId      String
-  pubkey      String
-  signature   String
-  createdAt   DateTime    @default(now())
+  id            String      @id @default(cuid())
+  termsHash     String
+  negotiationId String
+  negotiation   Negotiation @relation(fields: [negotiationId], references: [id], onDelete: Cascade)
+  userId        String
+  pubkey        String
+  signature     String
+  createdAt     DateTime    @default(now())
 
   @@unique([termsHash, userId])
   @@index([termsHash])
