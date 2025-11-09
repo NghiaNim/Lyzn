@@ -24,9 +24,9 @@ const sugarContracts: Contract[] = [
     counterparty: 'Sugar Refinery',
     location: 'Louisiana',
     position: 'YES',
-    contracts: 100,
-    avgPrice: 0.45,
-    cost: 450,
+    contracts: 10000,
+    avgPrice: 45,
+    cost: 4500,
     payout: 1000,
     expiry: 'May 2026'
   },
@@ -36,10 +36,10 @@ const sugarContracts: Contract[] = [
     counterparty: 'Candy Manufacturer',
     location: 'Ohio',
     position: 'YES',
-    contracts: 50,
-    avgPrice: 0.32,
-    cost: 320,
-    payout: 1000,
+    contracts: 5000,
+    avgPrice: 32,
+    cost: 1600,
+    payout: 5000,
     expiry: 'Aug 2026'
   }
 ]
@@ -106,7 +106,7 @@ export default function RisksPage() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-400 mb-1">Avg Price</p>
-                      <p className="text-lg font-semibold">{(contract.avgPrice * 100).toFixed(0)}¢</p>
+                      <p className="text-lg font-semibold">{contract.avgPrice}¢</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400 mb-1">Your Cost</p>
@@ -171,7 +171,7 @@ export default function RisksPage() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-400 mb-1">Avg Price</p>
-                      <p className="text-lg font-semibold">{(contract.avgPrice * 100).toFixed(0)}¢</p>
+                      <p className="text-lg font-semibold">{contract.avgPrice}¢</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400 mb-1">Your Cost</p>

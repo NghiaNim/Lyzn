@@ -39,9 +39,9 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
     counterparty: 'Sugar Refinery',
     location: 'Louisiana',
     position: 'YES' as 'YES' | 'NO',
-    contracts: 100,
-    avgPrice: 0.45,
-    cost: 450,
+    contracts: 10000,
+    avgPrice: 45,
+    cost: 4500,
     payout: 1000,
     expiry: 'May 31, 2026',
     oracle: 'USDA Agricultural Prices API',
@@ -258,7 +258,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Avg Price</span>
-                        <span className="font-medium">{(contract.avgPrice * 100).toFixed(0)}¢</span>
+                        <span className="font-medium">{contract.avgPrice}¢</span>
                       </div>
                     </div>
                   </div>

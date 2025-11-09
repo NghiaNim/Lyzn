@@ -116,8 +116,8 @@ function AvailableContractsStep({
                       </div>
                       <div>
                         <p className="text-sm text-gray-400">Contracts Available</p>
-                        <p className="text-white font-medium">{contract.contracts} contracts</p>
-                        <p className="text-sm text-gray-400">Avg Price: {contract.avgPrice.toFixed(2)}¢</p>
+                        <p className="text-white font-medium">{contract.contracts.toLocaleString()} contracts</p>
+                        <p className="text-sm text-gray-400">Avg Price: {contract.avgPrice}¢</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 mb-4">

@@ -142,11 +142,11 @@ export default function MarketplacePage() {
                     <div className="grid grid-cols-6 gap-4 py-3 border-y border-gray-700 mb-4">
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Available</p>
-                        <p className="font-semibold">{contract.contracts}</p>
+                        <p className="font-semibold">{contract.contracts.toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Avg Price</p>
-                        <p className="font-semibold">{(contract.avgPrice * 100).toFixed(0)}¢</p>
+                        <p className="font-semibold">{contract.avgPrice}¢</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Your Cost</p>

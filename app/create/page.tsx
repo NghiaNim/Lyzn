@@ -31,17 +31,20 @@ function ContractCreationChat({
   const [isTyping, setIsTyping] = useState(false)
   const [showButtons, setShowButtons] = useState(false)
   const [contractData, setContractData] = useState<ContractData>({
-    commodity: initialRisk === 'sugar' ? 'Sugar' : initialRisk === 'wheat' ? 'Wheat' : '',
+    commodity: initialRisk ? initialRisk.charAt(0).toUpperCase() + initialRisk.slice(1).toLowerCase() : '',
     strikePrice: '',
     expiry: '',
     position: 'YES',
     protectionAmount: ''
   })
 
-  const conversationFlow = useMemo(() => [
+  const conversationFlow = useMemo(() => {
+    const capitalizedRisk = initialRisk ? initialRisk.charAt(0).toUpperCase() + initialRisk.slice(1).toLowerCase() : ''
+    
+    return [
     {
       assistant: initialRisk 
-        ? `I see you're interested in hedging ${initialRisk} price risk. Let me help you create a custom contract. What strike price would you like to set?`
+        ? `I see you're interested in hedging ${capitalizedRisk} price risk. Let me help you create a custom contract. What strike price would you like to set?`
         : "I'll help you create a custom hedge contract. First, what commodity or risk would you like to protect against?",
       user: initialRisk ? "I'd like to set the strike at $0.60 per pound." : "I need to hedge against sugar price increases.",
       delay: 2000,
@@ -118,7 +121,8 @@ function ContractCreationChat({
         setShowButtons(true)
       }
     }])
-  ], [initialRisk])
+  ]
+  }, [initialRisk])
 
   useEffect(() => {
     if (hasStartedRef.current) return
@@ -231,14 +235,28 @@ function CreateContractForm() {
   const handleChatComplete = (data: ContractData) => {
     setContractData(data)
     // Simulate AI generation
+    
+    // Determine oracle based on commodity
+    let oracle = 'Chainlink Price Feed'
+    const commodityLower = data.commodity.toLowerCase()
+    if (commodityLower === 'sugar') {
+      oracle = 'USDA Agricultural Prices API'
+    } else if (commodityLower === 'wheat') {
+      oracle = 'CME Group Market Data'
+    } else if (commodityLower === 'butter' || commodityLower === 'dairy') {
+      oracle = 'USDA Dairy Market News'
+    } else if (commodityLower === 'coffee') {
+      oracle = 'ICE Futures Coffee Price Feed'
+    } else if (commodityLower === 'oil' || commodityLower === 'diesel') {
+      oracle = 'EIA Energy Price Data'
+    }
+    
     const contract = {
       title: `Will ${data.commodity.toLowerCase()} exceed $${data.strikePrice} by ${data.expiry}?`,
       position: data.position,
       protectionAmount: data.protectionAmount,
       cost: Math.round(parseFloat(data.protectionAmount) * 0.1),
-      oracle: data.commodity === 'Sugar' ? 'USDA Agricultural Prices API' : 
-              data.commodity === 'Wheat' ? 'CME Group Market Data' : 
-              'Chainlink Price Feed',
+      oracle: oracle,
       settlement: 'Automatic via smart contract',
       collateral: Math.round(parseFloat(data.protectionAmount) * 0.15),
     }
