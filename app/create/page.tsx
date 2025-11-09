@@ -1,41 +1,249 @@
 'use client'
 
 import Navigation from '@/components/Navigation'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Sparkles, Info } from 'lucide-react'
+import { Sparkles, Info, Loader2, Send, CheckCircle } from 'lucide-react'
+
+interface Message {
+  role: 'user' | 'assistant' | 'system'
+  content: string
+}
+
+interface ContractData {
+  commodity: string
+  strikePrice: string
+  expiry: string
+  position: 'YES' | 'NO'
+  protectionAmount: string
+}
+
+function ContractCreationChat({ 
+  onComplete, 
+  initialRisk 
+}: { 
+  onComplete: (data: ContractData) => void
+  initialRisk: string
+}) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const hasStartedRef = useRef(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isTyping, setIsTyping] = useState(false)
+  const [showButtons, setShowButtons] = useState(false)
+  const [contractData, setContractData] = useState<ContractData>({
+    commodity: initialRisk === 'sugar' ? 'Sugar' : initialRisk === 'wheat' ? 'Wheat' : '',
+    strikePrice: '',
+    expiry: '',
+    position: 'YES',
+    protectionAmount: ''
+  })
+
+  const conversationFlow = useMemo(() => [
+    {
+      assistant: initialRisk 
+        ? `I see you're interested in hedging ${initialRisk} price risk. Let me help you create a custom contract. What strike price would you like to set?`
+        : "I'll help you create a custom hedge contract. First, what commodity or risk would you like to protect against?",
+      user: initialRisk ? "I'd like to set the strike at $0.60 per pound." : "I need to hedge against sugar price increases.",
+      delay: 2000,
+      action: () => {
+        if (!initialRisk) {
+          setContractData(prev => ({ ...prev, commodity: 'Sugar' }))
+        } else {
+          setContractData(prev => ({ ...prev, strikePrice: '0.60' }))
+        }
+      }
+    },
+    {
+      assistant: initialRisk 
+        ? "Great! $0.60/lb for the strike price. Now, when would you like this contract to expire?"
+        : "Perfect, sugar it is. What strike price threshold works for your business? This is the price point that triggers the payout.",
+      user: initialRisk ? "Let's set it to expire in June 2026." : "I think $0.60 per pound would work well.",
+      delay: 2000,
+      action: () => {
+        if (initialRisk) {
+          setContractData(prev => ({ ...prev, expiry: '2026-06' }))
+        } else {
+          setContractData(prev => ({ ...prev, strikePrice: '0.60' }))
+        }
+      }
+    },
+    {
+      assistant: initialRisk 
+        ? "June 2026 expiry noted. Now, would you like a YES position (get paid if price goes above $0.60) or NO position (get paid if it stays below)?"
+        : "Good choice at $0.60/lb. When should this contract expire?",
+      user: initialRisk ? "I'll take the YES position—I want protection if prices rise." : "June 2026 would be ideal for my planning cycle.",
+      delay: 2500,
+      action: () => {
+        if (initialRisk) {
+          setContractData(prev => ({ ...prev, position: 'YES' }))
+        } else {
+          setContractData(prev => ({ ...prev, expiry: '2026-06' }))
+        }
+      }
+    },
+    {
+      assistant: initialRisk 
+        ? "YES position selected. Finally, what protection amount do you need? This is how much you'd receive if the price exceeds $0.60."
+        : "Perfect. Do you want a YES position (paid if price rises above strike) or NO position (paid if it stays below)?",
+      user: initialRisk ? "I'd like $8,000 in protection to cover my exposure." : "YES position—I need protection against price increases.",
+      delay: 2000,
+      action: () => {
+        if (initialRisk) {
+          setContractData(prev => ({ ...prev, protectionAmount: '8000' }))
+        } else {
+          setContractData(prev => ({ ...prev, position: 'YES' }))
+        }
+      }
+    },
+    {
+      assistant: initialRisk 
+        ? "Excellent! I've got all the details. Let me generate your contract..."
+        : "Great choice. And what protection amount do you need? This is your potential payout if conditions are met.",
+      user: initialRisk ? null : "I'd like $8,000 in coverage.",
+      delay: initialRisk ? 1500 : 2000,
+      action: () => {
+        if (!initialRisk) {
+          setContractData(prev => ({ ...prev, protectionAmount: '8000' }))
+        }
+        if (initialRisk) {
+          setShowButtons(true)
+        }
+      }
+    },
+    ...(initialRisk ? [] : [{
+      assistant: "Perfect! I have everything I need. Let me generate your custom contract...",
+      user: null,
+      delay: 1500,
+      action: () => {
+        setShowButtons(true)
+      }
+    }])
+  ], [initialRisk])
+
+  useEffect(() => {
+    if (hasStartedRef.current) return
+    hasStartedRef.current = true
+
+    const startConversation = async () => {
+      for (let i = 0; i < conversationFlow.length; i++) {
+        const step = conversationFlow[i]
+        
+        setIsTyping(true)
+        await new Promise(resolve => setTimeout(resolve, 800))
+        setIsTyping(false)
+        
+        setMessages(prev => [...prev, { role: 'assistant', content: step.assistant }])
+        await new Promise(resolve => setTimeout(resolve, step.delay))
+        
+        if (step.user) {
+          setMessages(prev => [...prev, { role: 'user', content: step.user! }])
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+        
+        if (step.action) {
+          step.action()
+        }
+      }
+    }
+
+    startConversation()
+  }, [conversationFlow])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isTyping])
+
+  const handleGenerate = () => {
+    onComplete(contractData)
+  }
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      {/* Chat Container */}
+      <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 h-[400px] flex flex-col">
+        <div className="flex-1 overflow-y-auto space-y-4 mb-4 p-6">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                  message.role === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : message.role === 'system'
+                    ? 'bg-yellow-600/20 text-yellow-100 border border-yellow-500/30'
+                    : 'bg-slate-800 text-gray-100'
+                }`}
+              >
+                <p className="text-sm leading-relaxed">{message.content}</p>
+              </div>
+            </div>
+          ))}
+          
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="bg-slate-800 rounded-lg px-4 py-3">
+                <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Contract Summary */}
+      {showButtons && (
+        <div className="card bg-blue-600/10 border-blue-500 backdrop-blur-sm animate-fade-in">
+          <p className="text-sm text-blue-100 mb-4">
+            <strong>Your Contract Details:</strong>
+          </p>
+          <div className="text-sm text-blue-100 space-y-2 mb-6">
+            <p>• Commodity: {contractData.commodity}</p>
+            <p>• Strike Price: ${contractData.strikePrice}/lb</p>
+            <p>• Position: {contractData.position} (Get paid if price {contractData.position === 'YES' ? 'rises above' : 'stays below'} strike)</p>
+            <p>• Protection Amount: ${parseInt(contractData.protectionAmount).toLocaleString()}</p>
+            <p>• Your Cost: ${Math.round(parseInt(contractData.protectionAmount) * 0.1).toLocaleString()} (10% deposit)</p>
+            <p>• Expiry: {new Date(contractData.expiry).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+          </div>
+          <button 
+            onClick={handleGenerate}
+            className="btn-primary w-full inline-flex items-center justify-center gap-2"
+          >
+            <Sparkles className="w-5 h-5" />
+            Generate Contract with AI
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function CreateContractForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const risk = searchParams.get('risk') || ''
 
-  const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState({
-    commodity: risk === 'sugar' ? 'Sugar' : risk === 'wheat' ? 'Wheat' : '',
-    strikePrice: '',
-    expiry: '',
-    position: 'YES',
-    protectionAmount: '',
-  })
-
+  const [step, setStep] = useState<'chat' | 'review'>('chat')
+  const [contractData, setContractData] = useState<ContractData | null>(null)
   const [generatedContract, setGeneratedContract] = useState<any>(null)
 
-  const handleGenerate = () => {
+  const handleChatComplete = (data: ContractData) => {
+    setContractData(data)
     // Simulate AI generation
     const contract = {
-      title: `Will ${formData.commodity.toLowerCase()} exceed $${formData.strikePrice} by ${formData.expiry}?`,
-      position: formData.position,
-      protectionAmount: formData.protectionAmount,
-      cost: Math.round(parseFloat(formData.protectionAmount) * 0.1),
-      oracle: formData.commodity === 'Sugar' ? 'USDA Agricultural Prices API' : 
-              formData.commodity === 'Wheat' ? 'CME Group Market Data' : 
+      title: `Will ${data.commodity.toLowerCase()} exceed $${data.strikePrice} by ${data.expiry}?`,
+      position: data.position,
+      protectionAmount: data.protectionAmount,
+      cost: Math.round(parseFloat(data.protectionAmount) * 0.1),
+      oracle: data.commodity === 'Sugar' ? 'USDA Agricultural Prices API' : 
+              data.commodity === 'Wheat' ? 'CME Group Market Data' : 
               'Chainlink Price Feed',
       settlement: 'Automatic via smart contract',
-      collateral: Math.round(parseFloat(formData.protectionAmount) * 0.15),
+      collateral: Math.round(parseFloat(data.protectionAmount) * 0.15),
     }
     setGeneratedContract(contract)
-    setStep(2)
+    setStep('review')
   }
 
   const handlePost = () => {
@@ -56,143 +264,14 @@ function CreateContractForm() {
             <p className="text-gray-400">AI will help you structure your hedge</p>
           </div>
 
-          {step === 1 && (
-            <div className="space-y-6">
-              <div className="card">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-blue-400" />
-                  <h2 className="text-xl font-semibold">Contract Details</h2>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      What risk do you want to hedge?
-                    </label>
-                    <select
-                      value={formData.commodity}
-                      onChange={(e) => setFormData({ ...formData, commodity: e.target.value })}
-                      className="input-field"
-                    >
-                      <option value="">Select commodity...</option>
-                      <option value="Sugar">Sugar</option>
-                      <option value="Wheat">Wheat</option>
-                      <option value="Coffee">Coffee</option>
-                      <option value="Oil">Oil</option>
-                      <option value="Diesel">Diesel</option>
-                      <option value="EUR/USD">EUR/USD Currency</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Strike Price (per unit)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 0.55"
-                      value={formData.strikePrice}
-                      onChange={(e) => setFormData({ ...formData, strikePrice: e.target.value })}
-                      className="input-field"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">
-                      The price threshold that triggers the payout
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Expiry Date
-                    </label>
-                    <input
-                      type="month"
-                      value={formData.expiry}
-                      onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
-                      className="input-field"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Your Position
-                    </label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <button
-                        onClick={() => setFormData({ ...formData, position: 'YES' })}
-                        className={`p-4 rounded-lg border-2 transition-colors ${
-                          formData.position === 'YES'
-                            ? 'border-green-500 bg-green-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
-                        }`}
-                      >
-                        <div className="text-left">
-                          <p className="font-semibold text-green-400 mb-1">YES (Long)</p>
-                          <p className="text-sm text-gray-400">
-                            Get paid if price goes above strike
-                          </p>
-                        </div>
-                      </button>
-                      <button
-                        onClick={() => setFormData({ ...formData, position: 'NO' })}
-                        className={`p-4 rounded-lg border-2 transition-colors ${
-                          formData.position === 'NO'
-                            ? 'border-red-500 bg-red-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
-                        }`}
-                      >
-                        <div className="text-left">
-                          <p className="font-semibold text-red-400 mb-1">NO (Short)</p>
-                          <p className="text-sm text-gray-400">
-                            Get paid if price stays below strike
-                          </p>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Protection Amount ($)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g., 5000"
-                      value={formData.protectionAmount}
-                      onChange={(e) => setFormData({ ...formData, protectionAmount: e.target.value })}
-                      className="input-field"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">
-                      How much you want to protect (your potential payout)
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleGenerate}
-                  disabled={!formData.commodity || !formData.strikePrice || !formData.expiry || !formData.protectionAmount}
-                  className="btn-primary w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Sparkles className="w-5 h-5 inline mr-2" />
-                  Generate Contract with AI
-                </button>
-              </div>
-
-              <div className="card bg-blue-600/10 border-blue-500">
-                <div className="flex gap-3">
-                  <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-blue-100">
-                      <strong>How it works:</strong> Our AI will automatically generate the contract structure, 
-                      select the appropriate price oracle, calculate fair pricing, and create the smart contract logic. 
-                      You&apos;ll review everything before posting.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {step === 'chat' && (
+            <ContractCreationChat 
+              onComplete={handleChatComplete}
+              initialRisk={risk}
+            />
           )}
 
-          {step === 2 && generatedContract && (
+          {step === 'review' && generatedContract && (
             <div className="space-y-6">
               <div className="card border-green-500">
                 <div className="flex items-center gap-2 mb-4">
@@ -259,7 +338,7 @@ function CreateContractForm() {
                     <p className="text-sm font-semibold mb-2">How Settlement Works:</p>
                     <ol className="text-sm text-gray-400 space-y-1 list-decimal list-inside">
                       <li>Both parties deposit collateral into smart contract escrow</li>
-                      <li>At expiry, oracle reports the actual {formData.commodity} price</li>
+                      <li>At expiry, oracle reports the actual {contractData?.commodity} price</li>
                       <li>Smart contract automatically calculates and transfers payout</li>
                       <li>No manual intervention needed—100% trustless</li>
                     </ol>
@@ -267,7 +346,7 @@ function CreateContractForm() {
                 </div>
 
                 <div className="flex gap-3 mt-6">
-                  <button onClick={() => setStep(1)} className="btn-secondary flex-1">
+                  <button onClick={() => setStep('chat')} className="btn-secondary flex-1">
                     Adjust Terms
                   </button>
                   <button onClick={handlePost} className="btn-primary flex-1">
