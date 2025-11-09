@@ -6,12 +6,39 @@ import { Mail, Lock } from 'lucide-react'
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-950">
       <Navigation />
       
-      <div className="pt-32 pb-20 px-6">
+      {/* Background Image with Overlay */}
+      <div className="fixed inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/building-bg.jpg)'
+          }}
+        />
+        <div className="absolute inset-0 bg-slate-950/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/40"></div>
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+      </div>
+
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-1/4 -right-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="relative pt-32 pb-20 px-6 z-10">
         <div className="max-w-md mx-auto">
-          <div className="card">
+          <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold mb-2">Business Login</h1>
               <p className="text-gray-400">Access your LYZN dashboard</p>
