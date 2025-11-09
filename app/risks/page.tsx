@@ -222,13 +222,13 @@ export default function RisksPage() {
           </div>
 
           {/* Summary */}
-          <div className="card bg-gradient-to-r from-blue-600 to-blue-800">
+          <div className="card bg-slate-900/40 backdrop-blur-sm border-slate-800">
             <h3 className="text-xl font-semibold mb-3">💡 Recommended Action</h3>
-            <p className="text-blue-100 mb-4">
+            <p className="text-gray-300 mb-4">
               Based on your risk profile, we recommend hedging your sugar exposure first (highest risk). 
               The May 2026 contract at 45¢ offers good protection at a reasonable cost.
             </p>
-            <p className="text-sm text-blue-200">
+            <p className="text-sm text-gray-400">
               <strong>Potential savings:</strong> If sugar prices spike 40% again, this $450 contract could save you $8,000+ in increased costs.
             </p>
           </div>

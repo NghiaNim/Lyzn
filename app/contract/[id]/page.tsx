@@ -190,7 +190,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                 {/* Sidebar */}
                 <div className="space-y-6">
                   {/* Purchase Card */}
-                  <div className="card sticky top-24">
+                  <div className="card">
                     <h3 className="text-xl font-semibold mb-4">Purchase Contract</h3>
                     
                     <div className="space-y-4 mb-6">
