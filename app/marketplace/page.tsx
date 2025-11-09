@@ -55,7 +55,6 @@ function orderToContract(order: any): Contract {
 }
 
 export default function MarketplacePage() {
-  const { contracts: allContracts } = useContracts()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [contracts, setContracts] = useState<Contract[]>([])

@@ -6,13 +6,13 @@ A production-ready monorepo for a non-custodial risk exchange platform built on 
 
 The monorepo consists of three main applications:
 
-1. **apps/web** - Next.js (App Router) application with:
+1. **server/web** - Next.js (App Router) application with:
    - Prisma + Supabase PostgreSQL for order/contract management
    - NextAuth for authentication
    - REST API for orders, counters, contracts, and matching
    - Non-custodial first design (client signs transactions)
 
-2. **apps/chain-adapter** - Go service that:
+2. **server/chain-adapter** - Go service that:
    - Builds and submits Solana transactions
    - Runs schedulers for contract expiry and settlement
    - Handles retries and idempotent operations
@@ -46,7 +46,7 @@ cd Lyzn
 pnpm install
 
 # Install Go dependencies
-cd apps/chain-adapter
+cd server/chain-adapter
 go mod download
 cd ../..
 ```
@@ -87,7 +87,7 @@ The Solana test validator will be available at `http://localhost:8899`
 
 ```bash
 # Generate Prisma client
-cd apps/web
+cd server/web
 pnpm db:generate
 
 # Run migrations
@@ -107,7 +107,7 @@ anchor build
 # The program ID will be printed - update it in:
 # - programs/risk-exchange/declare_id!() in src/lib.rs
 # - .env PROGRAM_ID
-# - apps/chain-adapter/.env PROGRAM_ID
+# - server/chain-adapter/.env PROGRAM_ID
 ```
 
 ### 7. Fund Dev Wallets
@@ -145,11 +145,11 @@ make dev
 # Or start individually:
 # Terminal 1: Next.js app
 make web
-# or: cd apps/web && pnpm dev
+# or: cd server/web && pnpm dev
 
 # Terminal 2: Go chain-adapter
 make adapter
-# or: cd apps/chain-adapter && go run ./main.go
+# or: cd server/chain-adapter && go run ./main.go
 ```
 
 ## Development
@@ -245,14 +245,14 @@ anchor test
 ### Test Go Service
 
 ```bash
-cd apps/chain-adapter
+cd server/chain-adapter
 go test ./...
 ```
 
 ### Test Next.js App
 
 ```bash
-cd apps/web
+cd server/web
 pnpm test
 ```
 
@@ -292,7 +292,7 @@ See [SECURITY.md](./SECURITY.md) for detailed security documentation.
 1. Build all applications:
    ```bash
    pnpm build
-   cd apps/chain-adapter && make build
+   cd server/chain-adapter && make build
    cd programs/risk-exchange && anchor build
    ```
 
@@ -304,7 +304,7 @@ See [SECURITY.md](./SECURITY.md) for detailed security documentation.
 
 3. Run database migrations:
    ```bash
-   cd apps/web
+   cd server/web
    pnpm db:migrate
    ```
 

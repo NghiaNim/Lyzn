@@ -14,7 +14,7 @@ check-env: ## Check if required environment variables are set
 
 install: ## Install all dependencies
 	pnpm install
-	cd apps/chain-adapter && go mod download && go mod tidy
+	cd server/chain-adapter && go mod download && go mod tidy
 	@echo "Note: Anchor program build requires Anchor CLI. Run 'anchor build' in programs/risk-exchange after installing Anchor."
 
 dev: ## Start all services in development mode
@@ -29,7 +29,7 @@ web: ## Start only the web app
 	pnpm --filter web dev
 
 adapter: ## Start only the chain-adapter service
-	cd apps/chain-adapter && go run ./main.go
+	cd server/chain-adapter && go run ./main.go
 
 program-build: ## Build the Solana program
 	cd programs/risk-exchange && anchor build
@@ -38,19 +38,19 @@ program-test: ## Test the Solana program
 	cd programs/risk-exchange && anchor test
 
 db-migrate: ## Run database migrations
-	cd apps/web && pnpm db:migrate
+	cd server/web && pnpm db:migrate
 
 db-studio: ## Open Prisma Studio
-	cd apps/web && pnpm db:studio
+	cd server/web && pnpm db:studio
 
 clean: ## Clean build artifacts
 	rm -rf node_modules
-	rm -rf apps/*/node_modules
+	rm -rf server/*/node_modules
 	rm -rf packages/*/node_modules
-	rm -rf apps/*/.next
-	rm -rf apps/*/dist
+	rm -rf server/*/.next
+	rm -rf server/*/dist
 	rm -rf packages/*/dist
-	cd apps/chain-adapter && rm -rf bin/
+	cd server/chain-adapter && rm -rf bin/
 	cd programs/risk-exchange && anchor clean
 
 docker-up: ## Start Docker services
@@ -64,11 +64,11 @@ docker-logs: ## View Docker logs
 
 test-pyth-ts: ## Test Pyth integration (TypeScript)
 	@echo "Testing Pyth integration with TypeScript..."
-	cd apps/web && npx tsx scripts/test-pyth.ts
+	cd server/web && npx tsx scripts/test-pyth.ts
 
 test-pyth-go: ## Test Pyth integration (Go)
 	@echo "Testing Pyth integration with Go..."
-	cd apps/chain-adapter && go run ../../scripts/test-pyth.go
+	cd server/chain-adapter && go run ../../scripts/test-pyth.go
 
 test-pyth: test-pyth-ts ## Test Pyth integration (all)
 	@echo "Running all Pyth tests..."

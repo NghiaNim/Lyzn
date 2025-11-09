@@ -18,7 +18,7 @@ pnpm install
 # Install Go dependencies
 if command -v go >/dev/null 2>&1; then
     echo "📦 Installing Go dependencies..."
-    cd apps/chain-adapter
+    cd server/chain-adapter
     go mod download
     go mod tidy
     cd ../..
@@ -37,9 +37,9 @@ else
 fi
 
 # Generate Prisma client
-if [ -f apps/web/prisma/schema.prisma ]; then
+if [ -f server/web/prisma/schema.prisma ]; then
     echo "🔧 Generating Prisma client..."
-    cd apps/web
+    cd server/web
     pnpm db:generate
     cd ../..
 fi
