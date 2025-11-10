@@ -82,7 +82,7 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-950/98 backdrop-blur-xl border-b border-slate-800/50 py-4">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-950 backdrop-blur-xl border-b border-slate-800/50 py-4 shadow-2xl">
             <div className="flex flex-col gap-4 px-4">
               <Link 
                 href="/about" 

@@ -441,9 +441,7 @@ export default function Home() {
               <p className="text-gray-500 text-sm">Institutional Risk Management for SMEs</p>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-gray-500 text-sm mb-1">Built at HackPrinceton</p>
-              <p className="text-gray-600 text-xs">Crystal Low · Angelina Yeh · Anna Zhang · Nghia Nim</p>
-              <p className="text-gray-600 text-xs mt-2">Contact: nghia.nim@columbia.edu</p>
+              <p className="text-gray-600 text-xs">Contact: nghia.nim@columbia.edu</p>
             </div>
           </div>
         </div>

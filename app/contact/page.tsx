@@ -128,19 +128,6 @@ export default function ContactPage() {
               </button>
             </form>
           </div>
-
-          <div className="card bg-blue-600/10 border-blue-500 mt-8">
-            <div className="flex items-start gap-4">
-              <MapPin className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-semibold mb-2">Built at HackPrinceton</h3>
-                <p className="text-sm text-blue-100">
-                  LYZN was created by Crystal Low, Angelina Yeh, Anna Zhang, and Nghia Nim as part of 
-                  our mission to bring institutional hedging tools to small businesses everywhere.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

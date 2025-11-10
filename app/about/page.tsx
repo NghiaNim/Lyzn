@@ -94,38 +94,6 @@ export default function AboutPage() {
               </div>
             </section>
 
-            <section className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-3">Our Team</h2>
-                  <p className="text-gray-300 leading-relaxed mb-4">
-                    Built at HackPrinceton by a team passionate about financial inclusion:
-                  </p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-700/50 p-4 rounded-lg">
-                      <p className="font-semibold">Crystal Low</p>
-                      <p className="text-sm text-gray-400">Co-founder</p>
-                    </div>
-                    <div className="bg-slate-700/50 p-4 rounded-lg">
-                      <p className="font-semibold">Angelina Yeh</p>
-                      <p className="text-sm text-gray-400">Co-founder</p>
-                    </div>
-                    <div className="bg-slate-700/50 p-4 rounded-lg">
-                      <p className="font-semibold">Anna Zhang</p>
-                      <p className="text-sm text-gray-400">Co-founder</p>
-                    </div>
-                    <div className="bg-slate-700/50 p-4 rounded-lg">
-                      <p className="font-semibold">Nghia Nim</p>
-                      <p className="text-sm text-gray-400">Co-founder</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
             <section className="card bg-slate-900/40 backdrop-blur-sm border-slate-800">
               <h2 className="text-2xl font-bold mb-3">Why Now?</h2>
               <p className="text-gray-300 leading-relaxed mb-4">
