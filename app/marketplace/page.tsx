@@ -54,54 +54,54 @@ export default function MarketplacePage() {
         <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
       </div>
       
-      <div className="relative pt-24 pb-12 px-6 z-10">
+      <div className="relative pt-24 pb-12 px-4 sm:px-6 z-10">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Contract Marketplace</h1>
-            <p className="text-gray-400">Browse and purchase event contracts from other businesses</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Contract Marketplace</h1>
+            <p className="text-sm sm:text-base text-gray-400">Browse and purchase event contracts from other businesses</p>
           </div>
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
-              <p className="text-sm text-gray-400 mb-1">Total Contracts</p>
-              <p className="text-2xl font-bold">{allContracts.length}</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-400 mb-1">Total Contracts</p>
+              <p className="text-xl sm:text-2xl font-bold">{allContracts.length}</p>
             </div>
-            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
-              <p className="text-sm text-gray-400 mb-1">24h Volume</p>
-              <p className="text-2xl font-bold">
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-400 mb-1">24h Volume</p>
+              <p className="text-xl sm:text-2xl font-bold">
                 ${(allContracts.reduce((sum, c) => sum + c.volume24h, 0) / 1000).toFixed(0)}K
               </p>
             </div>
-            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
-              <p className="text-sm text-gray-400 mb-1">Active Users</p>
-              <p className="text-2xl font-bold">1,247</p>
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-400 mb-1">Active Users</p>
+              <p className="text-xl sm:text-2xl font-bold">1,247</p>
             </div>
-            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
-              <p className="text-sm text-gray-400 mb-1">Avg Protection</p>
-              <p className="text-2xl font-bold">$5,000</p>
+            <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-400 mb-1">Avg Protection</p>
+              <p className="text-xl sm:text-2xl font-bold">$5,000</p>
             </div>
           </div>
 
           {/* Search and Filter */}
           <div className="card mb-6">
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search contracts, commodities, or counterparties..."
+                  placeholder="Search contracts..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input-field pl-10"
+                  className="input-field pl-10 w-full"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
                 {categories.map(category => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap text-sm ${
                       selectedCategory === category
                         ? 'bg-blue-600 text-white'
                         : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
@@ -117,13 +117,13 @@ export default function MarketplacePage() {
           {/* Contracts Grid */}
           <div className="space-y-4">
             {filteredContracts.map((contract) => (
-              <div key={contract.id} className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 hover:border-blue-500 transition-colors">
+              <div key={contract.id} className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 hover:border-blue-500 transition-colors p-4 sm:p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-2">{contract.title}</h3>
-                        <div className="flex items-center gap-2 text-sm">
+                        <h3 className="text-base sm:text-xl font-semibold mb-2">{contract.title}</h3>
+                        <div className="flex items-center flex-wrap gap-2 text-xs sm:text-sm">
                           <span className="px-2 py-1 rounded bg-blue-600/20 text-blue-400">
                             {contract.category}
                           </span>
@@ -134,42 +134,42 @@ export default function MarketplacePage() {
                           }`}>
                             {contract.position}
                           </span>
-                          <span className="text-gray-400">·</span>
-                          <span className="text-gray-400">
+                          <span className="hidden sm:inline text-gray-400">·</span>
+                          <span className="text-gray-400 text-xs sm:text-sm">
                             {contract.counterparty} ({contract.location})
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-6 gap-4 py-3 border-y border-gray-700 mb-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 py-3 border-y border-gray-700 mb-4">
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Available</p>
-                        <p className="font-semibold">{contract.contracts.toLocaleString()}</p>
+                        <p className="text-sm sm:text-base font-semibold">{contract.contracts.toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Avg Price</p>
-                        <p className="font-semibold">{contract.avgPrice}¢</p>
+                        <p className="text-sm sm:text-base font-semibold">{contract.avgPrice}¢</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Your Cost</p>
-                        <p className="font-semibold text-red-400">${contract.cost}</p>
+                        <p className="text-sm sm:text-base font-semibold text-red-400">${contract.cost}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Payout</p>
-                        <p className="font-semibold text-green-400">${contract.payout.toLocaleString()}</p>
+                        <p className="text-sm sm:text-base font-semibold text-green-400">${contract.payout.toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">24h Volume</p>
-                        <p className="font-semibold">${(contract.volume24h / 1000).toFixed(1)}K</p>
+                        <p className="text-sm sm:text-base font-semibold">${(contract.volume24h / 1000).toFixed(1)}K</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-400 mb-1">Expiry</p>
-                        <p className="font-semibold">{contract.expiry}</p>
+                        <p className="text-sm sm:text-base font-semibold">{contract.expiry}</p>
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <button 
                         onClick={() => {
                           // Save purchase to localStorage
@@ -186,13 +186,13 @@ export default function MarketplacePage() {
                           alert('✅ Smart contract deployed! Position added to your dashboard.')
                           setTimeout(() => router.push('/dashboard'), 1500)
                         }}
-                        className="btn-primary"
+                        className="btn-primary w-full sm:w-auto"
                       >
                         Buy Now
                       </button>
                       <Link
                         href={`/negotiate/${contract.id}`}
-                        className="btn-secondary"
+                        className="btn-secondary w-full sm:w-auto text-center"
                       >
                         Negotiate
                       </Link>
@@ -214,12 +214,12 @@ export default function MarketplacePage() {
 
           {/* CTA */}
           <div className="mt-8 card bg-slate-900/40 backdrop-blur-sm border-slate-800">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold mb-2">Can&apos;t find what you need?</h3>
-                <p className="text-gray-300">Create a custom contract and let AI handle the details</p>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">Can&apos;t find what you need?</h3>
+                <p className="text-sm sm:text-base text-gray-300">Create a custom contract and let AI handle the details</p>
               </div>
-              <Link href="/create" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300 cursor-pointer">
+              <Link href="/create" className="btn-secondary bg-white text-slate-900 hover:bg-blue-600 hover:text-white transition-all duration-300 cursor-pointer w-full sm:w-auto text-center whitespace-nowrap">
                 Create Contract
               </Link>
             </div>

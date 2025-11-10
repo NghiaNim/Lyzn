@@ -92,23 +92,23 @@ function AvailableContractsStep({
   const totalPages = Math.ceil(relevantContracts.length / contractsPerPage)
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="text-center mb-8">
-        <div className="text-6xl mb-4">{getRiskIcon(riskType)}</div>
-        <h2 className="text-3xl font-bold mb-2">Available Contracts for {getRiskTitle(riskType)}</h2>
-        <p className="text-gray-400">Choose a contract to protect your business</p>
+    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="text-4xl sm:text-6xl mb-4">{getRiskIcon(riskType)}</div>
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 px-4">Available Contracts for {getRiskTitle(riskType)}</h2>
+        <p className="text-sm sm:text-base text-gray-400">Choose a contract to protect your business</p>
       </div>
 
       {relevantContracts.length > 0 ? (
         <>
           <div className="space-y-4">
             {displayedContracts.map((contract) => (
-              <div key={contract.id} className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 hover:border-blue-500 transition-all">
-                <div className="flex items-start gap-4">
-                  <div className="text-4xl">{getRiskIcon(riskType)}</div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold mb-2 text-white">{contract.title}</h3>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+              <div key={contract.id} className="card bg-slate-900/50 backdrop-blur-sm border-slate-800 hover:border-blue-500 transition-all p-4 sm:p-6">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="text-3xl sm:text-4xl">{getRiskIcon(riskType)}</div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-xl font-semibold mb-2 text-white break-words">{contract.title}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
                       <div>
                         <p className="text-sm text-gray-400">Position</p>
                         <p className="text-white font-medium">{contract.position} · {contract.counterparty}</p>
@@ -120,21 +120,21 @@ function AvailableContractsStep({
                         <p className="text-sm text-gray-400">Avg Price: {contract.avgPrice}¢</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-400">Cost</p>
-                        <p className="text-2xl font-bold text-yellow-400">${contract.cost}</p>
+                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
+                      <div>
+                        <p className="text-xs sm:text-sm text-gray-400">Cost</p>
+                        <p className="text-lg sm:text-2xl font-bold text-yellow-400">${contract.cost}</p>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-400">Payout if right</p>
-                        <p className="text-2xl font-bold text-green-400">${contract.payout.toLocaleString()}</p>
+                      <div>
+                        <p className="text-xs sm:text-sm text-gray-400">Payout if right</p>
+                        <p className="text-lg sm:text-2xl font-bold text-green-400">${contract.payout.toLocaleString()}</p>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-400">Expires</p>
-                        <p className="text-white font-medium">{contract.expiry}</p>
+                      <div>
+                        <p className="text-xs sm:text-sm text-gray-400">Expires</p>
+                        <p className="text-sm sm:text-base text-white font-medium">{contract.expiry}</p>
                       </div>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <button
                         onClick={() => onSelectContract(contract.id)}
                         className="btn-primary flex-1"
@@ -742,7 +742,7 @@ export default function DemoPage() {
         <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
       </div>
       
-      <div className="relative pt-24 pb-12 px-6 z-10">
+      <div className="relative pt-24 pb-12 px-4 sm:px-6 z-10">
         <div className="max-w-4xl mx-auto">
           {/* Intro */}
           {step === 'intro' && (
