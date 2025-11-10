@@ -187,22 +187,22 @@ export default function Home() {
               Bringing institutional-grade derivatives and hedging strategies to small and medium enterprises through AI-powered event contracts.
             </p>
             
-            <div className="hero-cta flex gap-6 justify-center items-center">
+            <div className="hero-cta flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center w-full max-w-2xl mx-auto px-4">
               <Link 
                 href="/demo" 
-                className="group relative px-10 py-5 bg-white text-slate-900 rounded-lg font-medium text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 hover:bg-blue-600 hover:text-white cursor-pointer"
+                className="group relative px-6 sm:px-10 py-4 sm:py-5 bg-white text-slate-900 rounded-lg font-medium text-base sm:text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 hover:bg-blue-600 hover:text-white cursor-pointer text-center whitespace-nowrap"
               >
-                <span className="relative z-10 flex items-center gap-3">
-                  View Platform Demo
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
+                  View Demo
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
                 </span>
               </Link>
               
               <Link 
                 href="/chat" 
-                className="group px-10 py-5 bg-slate-800/50 border border-slate-700 text-white rounded-lg font-medium text-lg backdrop-blur-sm transition-all duration-300 hover:bg-slate-800 hover:border-slate-600"
+                className="group px-6 sm:px-10 py-4 sm:py-5 bg-slate-800/50 border border-slate-700 text-white rounded-lg font-medium text-base sm:text-lg backdrop-blur-sm transition-all duration-300 hover:bg-slate-800 hover:border-slate-600 text-center whitespace-nowrap"
               >
-                Start Risk Assessment
+                Get Started
               </Link>
             </div>
           </div>
