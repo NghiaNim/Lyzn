@@ -3,7 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'LYZN - Peer-to-Peer Risk Management for Small Businesses',
+  title: 'Parity - Peer-to-Peer Risk Management for Small Businesses',
   description: 'Bringing Wall Street\'s hedging tools to Main Street through event contracts',
 }
 

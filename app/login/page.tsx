@@ -41,7 +41,7 @@ export default function LoginPage() {
           <div className="card bg-slate-900/50 backdrop-blur-sm border-slate-800">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold mb-2">Business Login</h1>
-              <p className="text-gray-400">Access your LYZN dashboard</p>
+              <p className="text-gray-400">Access your Parity dashboard</p>
             </div>
 
             <form className="space-y-4">

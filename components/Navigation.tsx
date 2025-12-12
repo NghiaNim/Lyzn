@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -32,8 +33,9 @@ export default function Navigation() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-xl sm:text-2xl font-normal text-white hover:text-blue-400 transition-colors" style={{ fontFamily: "'Libre Baskerville', 'Baskerville', 'Georgia', serif", letterSpacing: '0.15em' }}>
-            LYZN
+          <Link href="/" className="flex items-center gap-2 text-xl sm:text-2xl font-normal text-white hover:text-blue-400 transition-colors" style={{ fontFamily: "'Libre Baskerville', 'Baskerville', 'Georgia', serif", letterSpacing: '0.15em' }}>
+            <Image src="/parity.png" alt="Parity" width={32} height={32} className="w-8 h-8" />
+            Parity
           </Link>
           
           {/* Desktop Menu */}

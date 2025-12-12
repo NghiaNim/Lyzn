@@ -285,7 +285,7 @@ export default function Home() {
               <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6">
                 <Shield className="w-7 h-7 text-blue-400" />
               </div>
-              <h3 className="text-2xl font-normal text-white mb-4">LYZN Solution</h3>
+              <h3 className="text-2xl font-normal text-white mb-4">Parity Solution</h3>
               <ul className="space-y-3 text-gray-400">
                 <li className="flex items-center gap-3">
                   <span className="text-gray-400">—</span>
@@ -437,7 +437,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div>
-              <h3 className="text-2xl font-normal text-white mb-2 tracking-tight">LYZN</h3>
+              <h3 className="text-2xl font-normal text-white mb-2 tracking-tight">Parity</h3>
               <p className="text-gray-500 text-sm">Institutional Risk Management for SMEs</p>
             </div>
             <div className="text-center md:text-right">

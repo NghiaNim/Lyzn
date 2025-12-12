@@ -108,7 +108,7 @@ export default function ChatPage() {
                         <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
                           AI
                         </div>
-                        <span className="text-xs text-gray-400">LYZN Assistant</span>
+                        <span className="text-xs text-gray-400">Parity Assistant</span>
                       </div>
                     )}
                     <p className="whitespace-pre-wrap">{message.content}</p>

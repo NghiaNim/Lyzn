@@ -37,7 +37,7 @@ export default function AboutPage() {
       
       <div className="relative pt-32 pb-20 px-6 z-10">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold mb-6 text-center">About LYZN</h1>
+          <h1 className="text-5xl font-bold mb-6 text-center">About Parity</h1>
           <p className="text-xl text-gray-300 text-center mb-16">
             Bringing institutional hedging to Main Street
           </p>
@@ -52,7 +52,7 @@ export default function AboutPage() {
                   <h2 className="text-2xl font-bold mb-3">Our Mission</h2>
                   <p className="text-gray-300 leading-relaxed">
                     33.2 million US small businesses (99.9% of all businesses) face trillions in unhedged risk. 
-                    The $600 trillion derivatives market is built for institutions, not them. LYZN exists to change that.
+                    The $600 trillion derivatives market is built for institutions, not them. Parity exists to change that.
                     We&apos;re building a peer-to-peer marketplace where businesses can protect themselves from price 
                     volatility—just like Fortune 500 companies do.
                   </p>
@@ -69,7 +69,7 @@ export default function AboutPage() {
                   <h2 className="text-2xl font-bold mb-3">How We&apos;re Different</h2>
                   <p className="text-gray-300 leading-relaxed mb-4">
                     Traditional derivatives require $100K+ minimums, complex financial expertise, and expensive 
-                    legal agreements. LYZN uses AI to match businesses with natural counterparties and automates 
+                    legal agreements. Parity uses AI to match businesses with natural counterparties and automates 
                     everything with smart contracts.
                   </p>
                   <ul className="space-y-2 text-gray-300">
@@ -97,7 +97,7 @@ export default function AboutPage() {
             <section className="card bg-slate-900/40 backdrop-blur-sm border-slate-800">
               <h2 className="text-2xl font-bold mb-3">Why Now?</h2>
               <p className="text-gray-300 leading-relaxed mb-4">
-                Three technologies converged to make LYZN possible:
+                Three technologies converged to make Parity possible:
               </p>
               <div className="space-y-3 text-gray-300">
                 <div className="flex gap-3">

@@ -757,7 +757,7 @@ export default function DemoPage() {
                   style={{ width: '200px', height: '200px' }}
                 />
               </div>
-              <h1 className="text-5xl font-bold mb-4 text-white">LYZN Demo</h1>
+              <h1 className="text-5xl font-bold mb-4 text-white">Parity Demo</h1>
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                 Watch how we help a Brooklyn bakery hedge their sugar price risk
               </p>
@@ -1015,7 +1015,7 @@ export default function DemoPage() {
                 <h3 className="text-xl font-semibold mb-4">Contract Template</h3>
                 
                 <div className="bg-slate-900 p-6 rounded-lg font-mono text-sm mb-4 overflow-x-auto">
-                  <pre className="text-green-400">{`// LYZN Event Contract Template
+                  <pre className="text-green-400">{`// Parity Event Contract Template
 // Will be deployed when matched with counterparty
 
 contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.commodity.slice(1)}PriceProtection {
@@ -1252,7 +1252,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                 <div className="text-center">
                   <h3 className="text-2xl font-bold mb-3">Ready to Protect Your Business?</h3>
                   <p className="text-gray-300 mb-4">
-                    Join Sweet Treats Bakery and thousands of other SMEs hedging their risks with LYZN
+                    Join Sweet Treats Bakery and thousands of other SMEs hedging their risks with Parity
                   </p>
                   <button 
                     onClick={() => window.location.href = '/chat'}
@@ -1286,7 +1286,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                     <div>
                       <p className="text-sm text-green-300 mb-1">Listing ID</p>
                       <p className="font-mono text-xs text-green-100 break-all">
-                        LYZN-{Math.floor(Math.random() * 10000).toString().padStart(5, '0')}
+                        Parity-{Math.floor(Math.random() * 10000).toString().padStart(5, '0')}
                       </p>
                     </div>
                     <div>
@@ -1377,7 +1377,7 @@ contract ${contractParams.commodity.charAt(0).toUpperCase() + contractParams.com
                 <div className="text-center">
                   <h3 className="text-2xl font-bold mb-3">Ready to Protect Your Business?</h3>
                   <p className="text-gray-300 mb-4">
-                    Join Sweet Treats Bakery and thousands of other SMEs hedging their risks with LYZN
+                    Join Sweet Treats Bakery and thousands of other SMEs hedging their risks with Parity
                   </p>
                   <button 
                     onClick={() => window.location.href = '/chat'}
