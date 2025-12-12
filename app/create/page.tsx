@@ -351,8 +351,8 @@ function CreateContractForm() {
                       <span className="font-medium">${generatedContract.collateral.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Platform Fee (1%):</span>
-                      <span className="font-medium">${Math.round(generatedContract.cost * 0.01)}</span>
+                      <span className="text-gray-400">Platform Fee (2%):</span>
+                      <span className="font-medium">${Math.round(generatedContract.cost * 0.02)}</span>
                     </div>
                   </div>
 

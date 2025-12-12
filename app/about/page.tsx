@@ -87,7 +87,7 @@ export default function AboutPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-400 mt-1">✓</span>
-                      <span>1% fee vs 2-5% traditional derivatives desks</span>
+                      <span>2% fee vs 2-5% traditional derivatives desks</span>
                     </li>
                   </ul>
                 </div>

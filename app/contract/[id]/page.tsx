@@ -221,12 +221,12 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                           <span className="font-medium">×{quantity}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Platform fee (1%)</span>
-                          <span className="font-medium">${Math.round(contract.cost * quantity * 0.01)}</span>
+                          <span className="text-gray-400">Platform fee (2%)</span>
+                          <span className="font-medium">${Math.round(contract.cost * quantity * 0.02)}</span>
                         </div>
                         <div className="border-t border-gray-600 pt-2 mt-2 flex justify-between">
                           <span className="font-semibold">Total Cost</span>
-                          <span className="font-bold text-xl">${(contract.cost * quantity) + Math.round(contract.cost * quantity * 0.01)}</span>
+                          <span className="font-bold text-xl">${(contract.cost * quantity) + Math.round(contract.cost * quantity * 0.02)}</span>
                         </div>
                         <div className="flex justify-between pt-2 border-t border-gray-600">
                           <span className="font-semibold text-green-400">Potential Payout</span>
@@ -291,7 +291,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                     </div>
                     <div className="flex justify-between pt-3 border-t border-gray-600">
                       <span className="font-semibold">Total Deposit</span>
-                      <span className="font-bold text-xl">${(contract.cost * quantity) + Math.round(contract.cost * quantity * 0.01)}</span>
+                      <span className="font-bold text-xl">${(contract.cost * quantity) + Math.round(contract.cost * quantity * 0.02)}</span>
                     </div>
                   </div>
                 </div>
@@ -323,7 +323,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
                 </div>
                 <h2 className="text-3xl font-bold mb-4">Contract Purchased!</h2>
                 <p className="text-gray-300 mb-8">
-                  Your deposit of ${(contract.cost * quantity) + Math.round(contract.cost * quantity * 0.01)} has been 
+                  Your deposit of ${(contract.cost * quantity) + Math.round(contract.cost * quantity * 0.02)} has been 
                   successfully locked in the smart contract escrow.
                 </p>
 

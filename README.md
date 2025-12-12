@@ -195,11 +195,11 @@ Your payout: $5,000 (automatically transferred)
 
 ## Business Model
 
-**Revenue:** We take a 1% fee on each matched contract.
+**Revenue:** We take a 2% fee on each matched contract.
 
-**Why 1%:** Traditional OTC derivatives desks charge 2-5%. We're cheaper because we cut out the middleman—peer-to-peer matching means lower costs.
+**Why 2%:** Traditional OTC derivatives desks charge 2-5%. We're cheaper because we cut out the middleman—peer-to-peer matching means lower costs.
 
-**Example:** $10K contract → $100 platform fee
+**Example:** $10K contract → $200 platform fee
 
 Simple, transparent, aligned with helping SMEs save money.
 
